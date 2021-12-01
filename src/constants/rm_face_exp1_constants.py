@@ -1,0 +1,23 @@
+COL = ["faces",
+       "size_w",
+       "spacing_in_deg",
+       "setsize",
+       "n",
+       "stim_length",
+       "key_resp.keys",
+       "blockOrder",
+       "participant",
+       "blocks.thisN",
+       "blocks.thisIndex",
+       "trials.thisN",
+       "trials.thisIndex"]
+
+COL_discri = ["faces",
+              "size_w",
+              "setsize",
+              "key_resp.keys",
+              "participant",
+              "blocks.thisN",
+              "blocks.thisIndex",
+              "trials.thisN",
+              "trials.thisIndex"]

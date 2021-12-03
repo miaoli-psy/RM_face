@@ -4,13 +4,14 @@ read raw data of exp1
 import pandas as pd
 import os
 
-from src.common.process_basic_data_sturcture import convert_str_num_to_num, cal_deviation_score
-from src.common.process_dataframe import process_col, insert_new_col_from_two_cols
+from src.common.process_basic_data_sturcture import convert_str_num_to_num, cal_deviation_score, convert_size_to_str, \
+    convert_stimulus_type_exp1
+from src.common.process_dataframe import process_col, insert_new_col_from_two_cols, insert_new_col
 from src.constants.rm_face_exp1_constants import COL_exp1, COL_exp1_discri
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = False
+    is_main_exp = True
 
     # TODO
     if is_main_exp:
@@ -43,6 +44,12 @@ if __name__ == '__main__':
 
     # cal deviation score
     insert_new_col_from_two_cols(totalData, "response", "setsize", "deviation_score", cal_deviation_score)
+
+    # convert size to str - categorical
+    insert_new_col(totalData, "size_w", "stimulus_size", convert_size_to_str)
+
+    # convert stimulus type
+    insert_new_col(totalData, "stimulus_types", "type", convert_stimulus_type_exp1)
 
     if to_excel:
         totalData.to_excel("try.xlsx", index = False)

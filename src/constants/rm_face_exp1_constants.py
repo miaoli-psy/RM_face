@@ -1,4 +1,4 @@
-COL = ["faces",
+COL_exp1 = ["faces",
        "size_w",
        "spacing_in_deg",
        "setsize",
@@ -9,10 +9,10 @@ COL = ["faces",
        "participant",
        "blocks.thisN",
        "blocks.thisIndex",
-       "trials.thisN",
-       "trials.thisIndex"]
+            "trials.thisN",
+            "trials.thisIndex"]
 
-COL_discri = ["faces",
+COL_exp1_discri = ["faces",
               "size_w",
               "setsize",
               "key_resp.keys",

@@ -6,7 +6,7 @@ import os
 
 from src.common.process_basic_data_sturcture import convert_str_num_to_num, cal_deviation_score
 from src.common.process_dataframe import process_col, insert_new_col_from_two_cols
-from src.constants.rm_face_exp1_constants import COL, COL_discri
+from src.constants.rm_face_exp1_constants import COL_exp1, COL_exp1_discri
 
 if __name__ == '__main__':
     to_excel = False
@@ -15,10 +15,10 @@ if __name__ == '__main__':
     # TODO
     if is_main_exp:
         PATH = "../../exp1/data/raw_data_exp1/"
-        col = COL
+        col = COL_exp1
     else:
         PATH = "../../exp1/data/raw_data_exp1_discri/"
-        col = COL_discri
+        col = COL_exp1_discri
 
     # list data file
     files = os.listdir(PATH)

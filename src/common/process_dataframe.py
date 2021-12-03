@@ -16,5 +16,13 @@ def insert_new_col_from_two_cols(input_df: pd.DataFrame, old_col1: str, old_col2
         raise Exception(f"Warning: missing {old_col1} or {old_col2}")
 
 
+def insert_new_col(input_df: pd.DataFrame, old_col: str, new_col: str, func_name):
+    if old_col in input_df.columns:
+        col_index = input_df.columns.get_loc(old_col)
+        input_df.insert(col_index, new_col, input_df[old_col].map(func_name))
+    else:
+        raise Exception(f"Warning: missing {old_col}")
+
+
 def rename_df_col(df: pd.DataFrame, old_col_name: str, new_col_name: str):
     df.rename(columns = {old_col_name: new_col_name}, inplace = True)

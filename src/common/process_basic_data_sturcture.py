@@ -47,3 +47,19 @@ def convert_size_to_str(inputsize: float):
         return "medium"
     elif inputsize == 1.132:
         return "large"
+
+
+def convert_stimulus_type_exp1(inputtype: str):
+    if inputtype == "stims/outline.png":
+        return "outline"
+    elif inputtype == "stims/surface.png":
+        return "surface"
+    elif inputtype == "stims/NF.png":
+        return "face"
+
+
+def convert_stimulus_type_exp2(inputtype: str):
+    if inputtype == "stims/NF.png":
+        return "normal"
+    elif inputtype == "stims/NF_usd.png":
+        return "upside_down"

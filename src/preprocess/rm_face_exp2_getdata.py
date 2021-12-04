@@ -7,7 +7,7 @@ import os
 from src.common.process_basic_data_sturcture import convert_str_num_to_num, get_usd_resp_order1, get_usd_resp_order2, \
     cal_deviation_score, convert_size_to_str, convert_stimulus_type_exp2
 from src.common.process_dataframe import insert_new_col_from_two_cols, insert_new_col
-from src.constants.rm_face_exp1_constants import COL_exp2, COL_exp2_discri
+from src.constants.rm_face_exp_constants import COL_exp2, COL_exp2_discri
 
 if __name__ == '__main__':
     to_excel = False

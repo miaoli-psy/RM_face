@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 from src.common.process_basic_data_sturcture import convert_str_num_to_num, cal_deviation_score, convert_size_to_str, \
-    convert_stimulus_type_exp1
+    convert_stimulus_type_exp1, get_new_spacing_con
 from src.common.process_dataframe import process_col, insert_new_col_from_two_cols, insert_new_col
 from src.constants.rm_face_exp_constants import COL_exp1, COL_exp1_discri
 
@@ -50,6 +50,9 @@ if __name__ == '__main__':
 
     # convert stimulus type
     insert_new_col(totalData, "stimulus_types", "type", convert_stimulus_type_exp1)
+
+    # insert new spacing condition
+    insert_new_col(totalData, "spacing_in_deg", "spacing", get_new_spacing_con)
 
     if to_excel:
         totalData.to_excel("try.xlsx", index = False)

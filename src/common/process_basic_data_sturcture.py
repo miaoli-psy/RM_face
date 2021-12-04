@@ -63,3 +63,14 @@ def convert_stimulus_type_exp2(inputtype: str):
         return "normal"
     elif inputtype == "stims/NF_usd.png":
         return "upside_down"
+
+
+def get_new_spacing_con(input_spacing: float):
+    if input_spacing < 0.03:
+        return "minimum spacing: 0 - 0.02 "
+    elif 0.1 < input_spacing < 0.3:
+        return "small spacing 0.1 - 0.25"
+    elif 0.39 <= input_spacing <= 0.6:
+        return "large spacing 0.39, 0.5, 0.6 for small, medium, large size"
+    elif input_spacing > 0.6:
+        return "large spacing for setsize 3 to match"

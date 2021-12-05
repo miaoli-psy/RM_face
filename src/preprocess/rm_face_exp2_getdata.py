@@ -5,13 +5,13 @@ import pandas as pd
 import os
 
 from src.common.process_basic_data_sturcture import convert_str_num_to_num, get_usd_resp_order1, get_usd_resp_order2, \
-    cal_deviation_score, convert_size_to_str, convert_stimulus_type_exp2, get_new_spacing_con
+    cal_deviation_score, convert_size_to_str, convert_stimulus_type_exp2, get_new_spacing_con, is_resp_correct, is_face_usd
 from src.common.process_dataframe import insert_new_col_from_two_cols, insert_new_col
 from src.constants.rm_face_exp_constants import COL_exp2, COL_exp2_discri
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = True
+    is_main_exp = False
 
     # TODO
     if is_main_exp:
@@ -43,6 +43,9 @@ if __name__ == '__main__':
                                             "faces":           "stimulus_types",
                                             "key_resp_7.keys": "response2"})
 
+    # add is_face_usd for discri data
+    insert_new_col(totalData, "stimulus_types", "is_face_usd", is_face_usd)
+
     # process 2 responses
     totalData_order1 = totalData[totalData["order"] == 1]
     totalData_order2 = totalData[totalData["order"] == 2]
@@ -64,11 +67,11 @@ if __name__ == '__main__':
     # convert stimulus type
     insert_new_col(totalData, "stimulus_types", "type", convert_stimulus_type_exp2)
 
-    # insert new spacing condition
-    ori_spacing = totalData.spacing_in_deg.unique()
-    ori_spacing.sort()
+    if is_main_exp:
+        insert_new_col(totalData, "spacing_in_deg", "spacing", get_new_spacing_con)
 
-    insert_new_col(totalData, "spacing_in_deg", "spacing", get_new_spacing_con)
+    if not is_main_exp:
+        insert_new_col(totalData, "deviation_score", "correct", is_resp_correct)
 
     if to_excel:
         totalData.to_excel("try.xlsx", index = False)

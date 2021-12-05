@@ -81,3 +81,10 @@ def is_resp_correct(input_dv):
         return 1
     else:
         return 0
+
+
+def is_face_usd(inputfacetype):
+    if inputfacetype == "stims/NF_usd.png":
+        return 1
+    elif inputfacetype == "stims/NF.png":
+        return 0

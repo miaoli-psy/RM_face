@@ -40,7 +40,6 @@ COL_exp2 = ["faces",
 
 COL_exp2_discri = ["faces",
                    "size_w",
-                   "spacing_in_deg",
                    "setsize",
                    "key_resp.keys",
                    "order",
@@ -50,4 +49,4 @@ COL_exp2_discri = ["faces",
                    "trials.thisN",
                    "trials.thisIndex",
                    "key_resp_7.keys",
-                   "is_face_usd"]
+                   "n"]

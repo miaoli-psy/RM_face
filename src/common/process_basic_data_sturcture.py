@@ -74,3 +74,10 @@ def get_new_spacing_con(input_spacing: float):
         return "large spacing 0.39, 0.5, 0.6 for small, medium, large size"
     elif input_spacing > 0.6:
         return "large spacing for setsize 3 to match"
+
+
+def is_resp_correct(input_dv):
+    if input_dv == 0:
+        return 1
+    else:
+        return 0

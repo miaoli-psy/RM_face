@@ -179,7 +179,7 @@ my_plot3 <-  ggplot() +
                                         y = mean_deviation_score,
                                         size = stimulus_size,
                                         color = stimulus_size),
-           position = "dodge", stat = "identity", alpha = 0.4, width = 0.2) +
+             position = position_dodge(0.2), stat = "identity", alpha = 0.4, width = 0.2) +
   
   scale_size_manual(values = c("small" = 2, "medium"= 4, "large" = 6)) +
   
@@ -197,10 +197,11 @@ my_plot3 <-  ggplot() +
   geom_errorbar(data = all_data_average, aes(x = type,
                                              y = mean_deviation_score,
                                              ymin = mean_deviation_score - SEM,
-                                             ymax = mean_deviation_score + SEM),
+                                             ymax = mean_deviation_score + SEM,
+                                             group = stimulus_size),
 
                 color = "black",
-                size  = 0.6,
+                size  = 0.8,
                 width = .00,
                 position = position_dodge(0.2)) +
   

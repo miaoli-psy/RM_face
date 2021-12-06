@@ -5,13 +5,14 @@ import pandas as pd
 import os
 
 from src.common.process_basic_data_sturcture import convert_str_num_to_num, get_usd_resp_order1, get_usd_resp_order2, \
-    cal_deviation_score, convert_size_to_str, convert_stimulus_type_exp2, get_new_spacing_con, is_resp_correct, is_face_usd
+    cal_deviation_score, convert_size_to_str, convert_stimulus_type_exp2, get_new_spacing_con, is_resp_correct, \
+    is_face_usd, get_if_rm_occor
 from src.common.process_dataframe import insert_new_col_from_two_cols, insert_new_col
 from src.constants.rm_face_exp_constants import COL_exp2, COL_exp2_discri
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = False
+    is_main_exp = True
 
     # TODO
     if is_main_exp:
@@ -44,7 +45,8 @@ if __name__ == '__main__':
                                             "key_resp_7.keys": "response2"})
 
     # add is_face_usd for discri data
-    insert_new_col(totalData, "stimulus_types", "is_face_usd", is_face_usd)
+    if not is_main_exp:
+        insert_new_col(totalData, "stimulus_types", "is_face_usd", is_face_usd)
 
     # process 2 responses
     totalData_order1 = totalData[totalData["order"] == 1]
@@ -66,6 +68,9 @@ if __name__ == '__main__':
 
     # convert stimulus type
     insert_new_col(totalData, "stimulus_types", "type", convert_stimulus_type_exp2)
+
+    # add col if rm occurs
+    insert_new_col(totalData, "deviation_score", "rm_trials", get_if_rm_occor)
 
     if is_main_exp:
         insert_new_col(totalData, "spacing_in_deg", "spacing", get_new_spacing_con)

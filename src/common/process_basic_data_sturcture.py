@@ -88,3 +88,10 @@ def is_face_usd(inputfacetype):
         return 1
     elif inputfacetype == "stims/NF.png":
         return 0
+
+
+def get_if_rm_occor(dv):
+    if dv < 0:
+        return "RM trails"
+    else:
+        return "no RM trials"

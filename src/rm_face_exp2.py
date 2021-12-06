@@ -4,8 +4,8 @@ from src.common.process_basic_data_sturcture import cal_SEM
 from src.common.process_dataframe import insert_new_col_from_two_cols, rename_df_col
 
 if __name__ == '__main__':
-    is_main_exp = False
-    to_excel = True
+    is_main_exp = True
+    to_excel = False
 
     PATH = "../exp2/data/"
 
@@ -26,13 +26,14 @@ if __name__ == '__main__':
     groupby3 = "stimulus_size"
     groupby4 = "participant"
     groupby5 = "type"
+    groupby6 = "rm_trials"
 
     # read data
     data = pd.read_excel(PATH + DATA)
 
     if is_main_exp:
-        groupby_list_perpp = [groupby1, groupby2, groupby3, groupby4, groupby5]
-        groupby_list_avg = [groupby1, groupby2, groupby3, groupby5]
+        groupby_list_perpp = [groupby1, groupby2, groupby3, groupby4, groupby5, groupby6]
+        groupby_list_avg = [groupby1, groupby2, groupby3, groupby5, groupby6]
     else:
         groupby_list_perpp = [groupby2, groupby3, groupby4, groupby5]
         groupby_list_avg = [groupby2, groupby3, groupby5]

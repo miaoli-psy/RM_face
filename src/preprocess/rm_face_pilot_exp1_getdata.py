@@ -15,10 +15,10 @@ if __name__ == '__main__':
 
     # TODO
     if is_main_exp:
-        PATH = "../../exp1/data/raw_data_exp1/"
+        PATH = "../../pilot_exp1/data/raw_data_exp1/"
         col = COL_exp1
     else:
-        PATH = "../../exp1/data/raw_data_exp1_discri/"
+        PATH = "../../pilot_exp1/data/raw_data_exp1_discri/"
         col = COL_exp1_discri
 
     # list data file

@@ -8,7 +8,7 @@ from src.common.process_basic_data_sturcture import convert_str_num_to_num, get_
     cal_deviation_score, convert_size_to_str, convert_stimulus_type_exp2, get_new_spacing_con, is_resp_correct, \
     is_face_usd, get_if_rm_occor
 from src.common.process_dataframe import insert_new_col_from_two_cols, insert_new_col
-from src.constants.rm_face_exp_constants import COL_exp2, COL_exp2_discri
+from src.constants.rm_face_pilot_exp_constants import COL_exp2, COL_exp2_discri
 
 if __name__ == '__main__':
     to_excel = False

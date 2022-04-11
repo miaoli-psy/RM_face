@@ -50,13 +50,13 @@ my_plot <-  ggplot() +
 
   labs(y = "Deviation score", x = "Spacing (deg)") +
   
-  scale_color_manual(values = c("face" = "#000080",
-                                "outline" = "#E7B800",
-                                "surface" = "#FC4E07")) +
+  scale_color_manual(values = c("NF" = "#000080",
+                                "NF_scramble" = "#E7B800",
+                                "outline" = "#FC4E07")) +
 
-  scale_fill_manual(values = c("face" = "#000080",
-                                "outline" = "#E7B800",
-                                "surface" = "#FC4E07")) +
+  scale_fill_manual(values = c("NF" = "#000080",
+                               "NF_scramble" = "#E7B800",
+                               "outline" = "#FC4E07")) +
   
   scale_x_continuous(limits = c(-0.05, 1.5)) +
   
@@ -73,14 +73,14 @@ my_plot <-  ggplot() +
         # Add axis line
         axis.line = element_line(colour = "grey")) +
   
-  facet_wrap( ~ setsize + stimulus_size,
+  facet_wrap( ~ setsize + size_scale,
               nrow = 4,
               labeller = labeller(setsize =
                                     c("3" = "setsize = 3",
                                       "4" = "setsize = 4",
                                       "5" = "setsize = 5",
                                       "6" = "setsize = 6"),
-                                  stimulus_size = c("small" = "small face 0.74*1.1",
+                                  size_scale = c("small" = "small face 0.74*1.1",
                                                     "medium" = "medium face 0.936*1.39",
                                                     "large" = "large face 1.132*1.68")))
 

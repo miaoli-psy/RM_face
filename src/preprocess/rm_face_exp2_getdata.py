@@ -69,6 +69,5 @@ if __name__ == '__main__':
     insert_new_col_from_two_cols(totalData, "identity", "response_usd", "CR", is_correct_rejection)
 
 
-
     if to_excel:
         totalData.to_excel("exp2_preprocessed.xlsx", index = False)

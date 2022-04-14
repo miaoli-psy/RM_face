@@ -171,7 +171,7 @@ data_across_subject2 <- data_preprocessed %>%
             resp_usd_std = sd(response_usd))
 
 # samplesize = 576(each condition 12 * 4 repetition * 12 participant)
-data_across_subject2 <- data_across_subject %>%
+data_across_subject2 <- data_across_subject2 %>%
   mutate(deviation_socre_SEM = deviation_score_std / sqrt(576),
          resp_usd_SEM = resp_usd_std / sqrt(576))
 

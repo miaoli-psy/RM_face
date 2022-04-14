@@ -9,11 +9,14 @@ from src.constants.rm_face_pilot_exp_constants import COL_exp2
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = True
+    is_main_exp = False
 
     if is_main_exp:
         PATH = "../../data/raw_data/exp2/"
-        col = COL_exp2
+    else:
+        PATH = "../../data/raw_data/exp2_disc/"
+
+    col = COL_exp2
 
     # list data file
     files = os.listdir(PATH)
@@ -28,7 +31,6 @@ if __name__ == '__main__':
 
     # keep valid cols
     totalData = totalData[col]
-
     # drop practice trials
     totalData = totalData.dropna(subset = ['identity'])
 
@@ -68,6 +70,8 @@ if __name__ == '__main__':
     insert_new_col_from_two_cols(totalData, "identity", "response_usd", "FA", is_false_alarm)
     insert_new_col_from_two_cols(totalData, "identity", "response_usd", "CR", is_correct_rejection)
 
-
     if to_excel:
-        totalData.to_excel("exp2_preprocessed.xlsx", index = False)
+        if is_main_exp:
+            totalData.to_excel("exp2_preprocessed.xlsx", index = False)
+        else:
+            totalData.to_excel("exp2_disc_preprocessed.xlsx", index = False)

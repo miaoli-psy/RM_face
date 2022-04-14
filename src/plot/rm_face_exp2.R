@@ -45,7 +45,7 @@ my_plot0 <- ggplot() +
 
 my_plot0
 
-# plot: deviation score - stimuli type, for all spacing -------------------
+# plot: deviation score - face ori, for all spacing -------------------
 
 # data by subject
 data_by_subject <- data_preprocessed %>%
@@ -63,7 +63,7 @@ data_across_subject <- data_preprocessed %>%
             resp_usd_mean = mean(response_usd),
             resp_usd_std = sd(response_usd))
 
-# samplesize = 144(each condition 12 repetitions  * 12 participant)
+# samplesize = 144(each condition 12 repetition  * 12 participant)
 data_across_subject <- data_across_subject %>%
   mutate(deviation_socre_SEM = deviation_score_std / sqrt(72),
          resp_usd_SEM = resp_usd_std / sqrt(72))
@@ -152,7 +152,7 @@ my_plot <-  ggplot() +
 print(my_plot)
 
 
-# plot: Deviation socre - stumuli type, combined spacing---------
+# plot: percent correct - face ori, combined spacing---------
 
 # data by subject
 data_by_subject2 <- data_preprocessed %>%
@@ -170,7 +170,7 @@ data_across_subject2 <- data_preprocessed %>%
             resp_usd_mean = mean(response_usd),
             resp_usd_std = sd(response_usd))
 
-# samplesize = 576(each condition 12 * 4 repitation * 12 participant)
+# samplesize = 576(each condition 12 * 4 repetition * 12 participant)
 data_across_subject2 <- data_across_subject %>%
   mutate(deviation_socre_SEM = deviation_score_std / sqrt(576),
          resp_usd_SEM = resp_usd_std / sqrt(576))
@@ -181,6 +181,7 @@ my_plot2 <-  ggplot() +
   geom_point(data = data_across_subject2, aes(x = identity,
                                              y = resp_usd_mean,
                                              size = size_scale,
+                                             group = size_scale,
                                              color = size_scale),
              position = position_dodge(0.2), stat = "identity", alpha = 0.6, width = 0.2) +
   
@@ -197,8 +198,8 @@ my_plot2 <-  ggplot() +
                                                 ymin = resp_usd_mean - resp_usd_SEM,
                                                 ymax = resp_usd_mean + resp_usd_SEM,
                                                 group = size_scale),
-                
                 color = "black",
+                
                 size  = 0.8,
                 width = .00,
                 position = position_dodge(0.2)) +
@@ -251,140 +252,183 @@ print(my_plot2)
 
 
 
-# plot: deviation score - set size,  separately for rm and non-rm --------
+# plot: deviation score - face oir combined spacing -----------------------
+my_plot6 <-  ggplot() +
+  
+  geom_point(data = data_across_subject2, aes(x = identity,
+                                              y = deviation_score_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = size_scale),
+             position = position_dodge(0.2), stat = "identity", alpha = 0.6, width = 0.2) +
+  
+  geom_point(data = data_by_subject2, aes(x = identity,
+                                          y = deviation_score_mean,
+                                          size = size_scale,
+                                          color = size_scale),
+             alpha = 0.05,
+             position = position_dodge(0.2)) +
+  
+  
+  geom_errorbar(data = data_across_subject2, aes(x = identity,
+                                                 y = deviation_score_mean,
+                                                 ymin = deviation_score_mean - deviation_socre_SEM,
+                                                 ymax = deviation_score_mean + deviation_socre_SEM,
+                                                 group = size_scale),
+                color = "black",
+                
+                size  = 0.8,
+                width = .00,
+                position = position_dodge(0.2)) +
+  
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  
+  
+  labs(y = "deviation score", x = "face orientation") +
+  
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "stimuli size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "stimuli size") +
+  
+  scale_y_continuous(limits = c(-2, 1)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold")) +
+  
+  scale_x_discrete(labels = c("NF" = "upright",
+                              "NF_usd" = "upside down")) +
+  
+  facet_wrap( ~ setsize,
+              nrow = 2,
+              labeller = labeller(setsize =
+                                    c("3" = "3 items",
+                                      "4" = "4 items",
+                                      "5" = "5 items",
+                                      "6" = "6 items")))
+print(my_plot6)
+
+# plot: percent correct - set size,  separately for rm and non-rm --------
 
 data_by_subject3 <- data_preprocessed %>%
-  group_by(setsize, participant, identity, size_scale, is_rm_trial) %>%
+  group_by(setsize, participant, size_scale, is_rm_trial) %>%
   summarise(deviation_score_mean = mean(deviation_score),
             deviation_score_std = sd(deviation_score),
             resp_usd_mean = mean(response_usd),
             resp_usd_std = sd(response_usd))
 
 data_across_subject3 <- data_preprocessed %>%
-  group_by(setsize, identity,size_scale, is_rm_trial) %>%
+  group_by(setsize, size_scale, is_rm_trial) %>%
   summarise(deviation_score_mean = mean(deviation_score),
             deviation_score_std = sd(deviation_score),
             resp_usd_mean = mean(response_usd),
             resp_usd_std = sd(response_usd))
 
-# samplesize = 144(each condition 12*3 repitation * 12 participant)
-data_across_subject3 <- data_across_subject2 %>%
-  mutate(deviation_socre_SEM = deviation_score_std / sqrt(432),
-         resp_usd_SEM = resp_usd_std / sqrt(432))
+# samplesize = 144(each condition 12* 4 repetition * 12 participant)
+data_across_subject3 <- data_across_subject3 %>%
+  mutate(deviation_socre_SEM = deviation_score_std / sqrt(576),
+         resp_usd_SEM = resp_usd_std / sqrt(576))
 
 
-
-
-
-# plot: Deviation socre - stumuli type, combined spacing ---------
-
-
-# data by subject
-data_by_subject2 <- data_preprocessed %>%
-  group_by(setsize, participant, identity, size_scale) %>%
-  summarise(deviation_score_mean = mean(deviation_score),
-            deviation_score_std = sd(deviation_score),
-            resp_usd_mean = mean(response_usd),
-            resp_usd_std = sd(response_usd))
-
-
-# data across subject
-data_across_subject2 <- data_preprocessed %>%
-  group_by(setsize, identity, size_scale) %>%
-  summarise(deviation_score_mean = mean(deviation_score),
-            deviation_score_std = sd(deviation_score),
-            resp_usd_mean = mean(response_usd),
-            resp_usd_std = sd(response_usd))
-
-# samplesize = 144(each condition 12 repetation * 12 participant)
-data_across_subject2 <- data_across_subjec2t %>%
-  mutate(deviation_socre_SEM = deviation_score_std / sqrt(144),
-         resp_usd_SEM = resp_usd_std / sqrt(144))
-
-
-
-
-
-# plot: remove setsize 3 extra large spacing ------------------------------
-
-# data by subject
-
-data_preprocessed<-subset(data_preprocessed, spacing!="to_match")
-
-data_by_subject2 <- data_preprocessed %>%
-  group_by(setsize, participant, identity,size_scale, is_rm_trial) %>%
-  summarise(deviation_score_mean = mean(deviation_score),
-            deviation_score_std = sd(deviation_score),
-            resp_usd_mean = mean(response_usd),
-            resp_usd_std = sd(response_usd))
-
-#
-
-
-my_plot3 <-  ggplot(data = data_across_subject2, aes(x = identity,
-                                                     y = resp_usd_mean,
-                                                     size = size_scale,
-                                                     color = is_rm_trial)) +
+my_plot3 <-  ggplot() +
   
-  geom_point(position = position_dodge(0.2), stat = "identity", alpha = 0.5) +
+  geom_point(data = data_across_subject3, aes(x = setsize,
+                                              y = resp_usd_mean,
+                                              group = size_scale,
+                                              size = size_scale,
+                                              color = is_rm_trial),
+             
+             position = position_dodge(width = 0.2), stat = "identity", alpha = 0.6) +
   
-  scale_size_manual(values = c("small" = 2, "middle"= 4, "large" = 6)) +
+  geom_point(data = data_by_subject3, aes(x = setsize,
+                                          y = resp_usd_mean,
+                                          size = size_scale,
+                                          color = is_rm_trial),
+             alpha = 0.05,
+             position = position_dodge(width = 0.2)) +
   
-  # geom_point(data = all_data_average_usd_pp, aes(x = type,
-  #                                                y = mean_resp_usd,
-  #                                                size = stimulus_size,
-  #                                                color = stimulus_size),
-  #            alpha = 0.05,
-  #            position = position_dodge(0.2))+
   
-  geom_errorbar(aes(x = identity, y = resp_usd_mean,
-                    ymin = resp_usd_mean - resp_usd_SEM,
-                    ymax = resp_usd_mean + resp_usd_SEM,
-                    group = size_scale,
-                    color = is_rm_trial),
-                
+  geom_errorbar(data = data_across_subject3, aes(x = setsize,
+                                                 y = resp_usd_mean,
+                                                 ymin = resp_usd_mean - resp_usd_SEM,
+                                                 ymax = resp_usd_mean + resp_usd_SEM,
+                                                 group = size_scale,
+                                                 color = is_rm_trial),
+
                 size  = 0.8,
                 width = .00,
-                position = position_dodge(0.2),
-                alpha = 0.8) +
+                alpha = 0.5,
+                position = position_dodge(width = 0.2)) +
   
   
-  labs(y = "Percent correct", x = "Type") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
   
-  scale_color_manual(values = c("RM trials" = "#E69138",
-                                "non RM trials" = "#674EA7")) +
+  geom_hline(yintercept = 0.75, linetype = "dashed") +
   
-  scale_fill_manual(values = c("RM trials" = "#E69138",
-                                "non RM trials" = "#674EA7")) +
   
-  # scale_x_continuous(limits = c(-0.05, 1.5)) +
+  labs(y = "Percent correct", x = "set size") +
   
-# scale_y_continuous(limits = c(0, 1.5)) +
-coord_cartesian(ylim = c(0, 1)) +
+
+  scale_color_manual(labels = c("non RM", "RM"),
+                     values = c("#004488", "#BB5566"),
+                     name = "RM or not") +
+
   
-  geom_hline(yintercept = 0.75, linetype = "dotted") +
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  scale_y_continuous(limits = c(0, 1)) +
   
   theme(axis.title.x = element_text(color="black", size=14, face="bold"),
         axis.title.y = element_text(color="black", size=14, face="bold"),
         panel.border = element_blank(),  
-        # Remove panel grid lines
+        # remove panel grid lines
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        # Remove panel background
+        # remove panel background
         panel.background = element_blank(),
-        # Add axis line
-        axis.line = element_line(colour = "grey")) +
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"))
   
-  facet_wrap( ~ setsize,
-              labeller = labeller(setsize =
-                                    c("3" = "setsize = 3",
-                                      "4" = "setsize = 4",
-                                      "5" = "setsize = 5",
-                                      "6" = "setsize = 6")))
-
+  
 print(my_plot3)
 
-# d prime -----------------------------------------------------------------
+
+
+
+
+
+# get SDT data-----------------------------------------------------------------
 
 # get "dprime.csv" and calculate in python
 # data_preprocessed<-subset(data_preprocessed, spacing!="to_match")
@@ -408,8 +452,173 @@ print(my_plot3)
 
 data_cdt <- read_excel("rm_face_SDT.xlsx")
 
+# plot: d_prime as a function of spacing ----------------------------------
 
-# plot: d_prime - spacing -------------------------------------------------
+# data by subject (identical as data_cdt, no std could be calcuated)
+data_by_subject4 <- data_cdt %>%
+  group_by(setsize, participant, size_scale, is_rm_trial) %>%
+  summarise(d_prime_mean = mean(d_prime),
+            d_prime_std = sd(d_prime),
+            c_mean = mean(c),
+            c_std = sd(c))
+
+# data across subject
+data_across_subject4 <- data_cdt %>%
+  group_by(setsize, size_scale, is_rm_trial) %>%
+  summarise(d_prime_mean = mean(d_prime),
+            d_prime_std = sd(d_prime),
+            c_mean = mean(c),
+            c_std = sd(c))
+
+# samplesize = 12 participants
+data_across_subject4 <- data_across_subject4 %>%
+  mutate(d_prime_SEM = d_prime_std / sqrt(12),
+         c_SEM = c_std / sqrt(12))
+
+# plot: d_prime for each set size, separately for rm and non-rm trials--------
+
+
+my_plot4 <-  ggplot() +
+  
+  geom_point(data = data_across_subject4, aes(x = setsize,
+                                              y = d_prime_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = is_rm_trial),
+             
+             position = position_dodge(0.2), stat = "identity", alpha = 0.6, width = 0.2) +
+  
+  geom_point(data = data_by_subject4, aes(x = setsize,
+                                          y = d_prime_mean,
+                                          size = size_scale,
+                                          color = is_rm_trial),
+             alpha = 0.05,
+             position = position_dodge(0.2)) +
+  
+  
+  geom_errorbar(data = data_across_subject4, aes(x = setsize,
+                                                 y = d_prime_mean,
+                                                 ymin = d_prime_mean - d_prime_SEM,
+                                                 ymax = d_prime_mean + d_prime_SEM,
+                                                 group = size_scale,
+                                                 color = is_rm_trial),
+                
+                size  = 0.8,
+                width = .00,
+                alpha = 0.8,
+                position = position_dodge(0.2)) +
+  
+  
+  labs(y = "sensitivity (d')", x = "set size") +
+  
+  
+  scale_color_manual(labels = c("non RM", "RM"),
+                     values = c("#004488", "#BB5566"),
+                     name = "RM or not") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  scale_y_continuous(limits = c(-0.5, 4)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"))
+
+
+print(my_plot4)
+
+
+# plot: criterion for each set size, separately for rm and non-rm trials--------
+
+my_plot5 <-  ggplot() +
+  
+  geom_point(data = data_across_subject4, aes(x = setsize,
+                                              y = c_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = is_rm_trial),
+             
+             position = position_dodge(0.2), stat = "identity", alpha = 0.6, width = 0.2) +
+  
+  geom_point(data = data_by_subject4, aes(x = setsize,
+                                          y = c_mean,
+                                          size = size_scale,
+                                          color = is_rm_trial),
+             alpha = 0.05,
+             position = position_dodge(0.2)) +
+  
+  
+  geom_errorbar(data = data_across_subject4, aes(x = setsize,
+                                                 y = c_mean,
+                                                 ymin = c_mean - c_SEM,
+                                                 ymax = c_mean + c_SEM,
+                                                 group = size_scale,
+                                                 color = is_rm_trial),
+                
+                size  = 0.8,
+                width = .00,
+                alpha = 0.8,
+                position = position_dodge(0.2)) +
+  
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  
+  
+  labs(y = "bias (criterion)", x = "set size") +
+  
+  
+  scale_color_manual(labels = c("non RM", "RM"),
+                     values = c("#004488", "#BB5566"),
+                     name = "RM or not") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  scale_y_continuous(limits = c(-1.5, 1)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"))
+
+
+print(my_plot5)
+
+
+
 
 
 

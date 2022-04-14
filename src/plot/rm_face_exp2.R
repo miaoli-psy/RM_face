@@ -252,7 +252,7 @@ print(my_plot2)
 
 
 
-# plot: deviation score - face oir combined spacing -----------------------
+# plot: deviation score - face ori combined spacing -----------------------
 my_plot6 <-  ggplot() +
   
   geom_point(data = data_across_subject2, aes(x = identity,

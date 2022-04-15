@@ -66,6 +66,20 @@ COL_exp1 = ["identity",
             "trials.thisN",
             "trials.thisIndex"]
 
+COL_exp1_discri = ["identity",
+                   "size_w",
+                   "size_scale",
+                   "spacing_in_deg",
+                   "setsize",
+                   "key_resp.keys",
+                   "key_resp.rt",
+                   "blockOrder",
+                   "participant",
+                   "blocks.thisN",
+                   "blocks.thisIndex",
+                   "trials.thisN",
+                   "trials.thisIndex"]
+
 COL_exp2 = ["identity",
             "size_w",
             "size_scale",

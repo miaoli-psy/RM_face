@@ -64,7 +64,9 @@ COL_exp1 = ["identity",
             "blocks.thisN",
             "blocks.thisIndex",
             "trials.thisN",
-            "trials.thisIndex"]
+            "trials.thisIndex",
+            "sex",
+            "age"]
 
 COL_exp1_discri = ["identity",
                    "size_w",
@@ -94,4 +96,6 @@ COL_exp2 = ["identity",
             "trials.thisN",
             "trials.thisIndex",
             "key_resp_7.keys",
-            "key_resp_7.rt"]
+            "key_resp_7.rt",
+            "sex",
+            "age"]

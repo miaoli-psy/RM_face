@@ -9,7 +9,7 @@ from src.constants.rm_face_pilot_exp_constants import COL_exp1, COL_exp1_discri
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = False
+    is_main_exp = True
 
     if is_main_exp:
         PATH = "../../data/raw_data/exp1/"
@@ -17,7 +17,6 @@ if __name__ == '__main__':
     else:
         PATH = "../../data/raw_data/exp1_disc/"
         col = COL_exp1_discri
-
 
 
     # list data file

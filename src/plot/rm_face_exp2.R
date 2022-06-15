@@ -9,6 +9,7 @@ library(lme4)
 library(lmerTest)
 library(MuMIn)
 library(psycho)
+library(svglite)
 
 # set working path
 setwd("D:/SCALab/projects/RM_face/data/")
@@ -260,14 +261,14 @@ my_plot6 <-  ggplot() +
                                               size = size_scale,
                                               group = size_scale,
                                               color = size_scale),
-             position = position_dodge(0.2), stat = "identity", alpha = 0.6, width = 0.2) +
+             position = position_dodge(0.5), stat = "identity", alpha = 0.6, width = 0.2) +
   
   geom_point(data = data_by_subject2, aes(x = identity,
                                           y = deviation_score_mean,
                                           size = size_scale,
                                           color = size_scale),
              alpha = 0.05,
-             position = position_dodge(0.2)) +
+             position = position_dodge(0.5)) +
   
   
   geom_errorbar(data = data_across_subject2, aes(x = identity,
@@ -279,22 +280,24 @@ my_plot6 <-  ggplot() +
                 
                 size  = 0.8,
                 width = .00,
-                position = position_dodge(0.2)) +
+                position = position_dodge(0.5)) +
+  
+  geom_jitter()+
   
   geom_hline(yintercept = 0, linetype = "dashed") +
   
   
-  labs(y = "deviation score", x = "face orientation") +
+  labs(y = "Deviation score", x = "Face orientation") +
   
   
   scale_color_manual(labels = c("large", "middle", "small"),
                      values = c("#004488", "#BB5566", "#DDAA33"),
-                     name = "stimuli size") +
+                     name = "face size") +
   
   
   scale_size_manual(labels = c("large", "middle", "small"),
                     values = c("large" = 6, "middle"= 4, "small" = 2),
-                    name = "stimuli size") +
+                    name = "face size") +
   
   scale_y_continuous(limits = c(-2, 1)) +
   
@@ -306,6 +309,7 @@ my_plot6 <-  ggplot() +
         panel.grid.minor = element_blank(),
         # remove panel background
         panel.background = element_blank(),
+        panel.spacing = unit(0.4, "cm"),
         # add axis line
         axis.line = element_line(colour = "grey"),
         # x,y axis tick labels
@@ -315,19 +319,24 @@ my_plot6 <-  ggplot() +
         legend.title = element_text(size = 12, face = "bold"),
         legend.text = element_text(size = 10),
         # facet wrap title
-        strip.text.x = element_text(size = 12, face = "bold")) +
+        strip.text.x = element_text(size = 12, face = "bold"),
+        # panel spacing
+        panel.spacing = unit(2.5, "lines")) +
+
   
   scale_x_discrete(labels = c("NF" = "upright",
-                              "NF_usd" = "upside down")) +
+                              "NF_usd" = "upside-down")) +
   
   facet_wrap( ~ setsize,
-              nrow = 2,
+              nrow = 1,
               labeller = labeller(setsize =
-                                    c("3" = "3 items",
-                                      "4" = "4 items",
-                                      "5" = "5 items",
-                                      "6" = "6 items")))
+                                    c("3" = "3 faces",
+                                      "4" = "4 faces",
+                                      "5" = "5 faces",
+                                      "6" = "6 faces")))
 print(my_plot6)
+
+ggsave(file = "test.svg", plot = my_plot6)
 
 # plot: percent correct - set size,  separately for rm and non-rm --------
 
@@ -387,7 +396,7 @@ my_plot3 <-  ggplot() +
   geom_hline(yintercept = 0.75, linetype = "dashed") +
   
   
-  labs(y = "Percent correct", x = "set size") +
+  labs(y = "Percent correct", x = "Set size") +
   
 
   scale_color_manual(labels = c("non RM", "RM"),
@@ -423,8 +432,42 @@ my_plot3 <-  ggplot() +
   
 print(my_plot3)
 
+ggsave(file = "test.svg", plot = my_plot3)
+
+# check percent correct differences between rm and non-rm
+data_by_subject3$setsize <- as.factor(data_by_subject3$setsize)
+data_by_subject3$is_rm_trial <- as.factor(data_by_subject3$is_rm_trial)
+data_by_subject3$participant <- as.factor(data_by_subject3$participant)
+data_by_subject3$size_scale <- as.factor(data_by_subject3$size_scale)
+
+str(data_by_subject3)
+
+# data_by_subject4 <- subset(data_by_subject4, size_scale == "small")
+
+alignment_con.model_random_slope <-
+  lmer(
+    resp_usd_mean ~ setsize + is_rm_trial + 
+      (1 |participant),
+    data = data_by_subject3,
+    REML = FALSE
+  )
+alignment_con.model_random_slope
 
 
+coef(alignment_con.model_random_slope)
+
+alignment_con.null_random_slope <-
+  lmer(
+    resp_usd_mean ~ setsize + 
+      (1 | participant),
+    data = data_by_subject3,
+    REML = FALSE
+  )
+alignment_con.null_random_slope
+
+
+anova(alignment_con.model_random_slope, 
+      alignment_con.null_random_slope)
 
 
 
@@ -486,14 +529,14 @@ my_plot4 <-  ggplot() +
                                               group = size_scale,
                                               color = is_rm_trial),
              
-             position = position_dodge(0.2), stat = "identity", alpha = 0.6, width = 0.2) +
+             position = position_dodge(0.8), stat = "identity", alpha = 0.6, width = 0.2) +
   
   geom_point(data = data_by_subject4, aes(x = setsize,
                                           y = d_prime_mean,
                                           size = size_scale,
                                           color = is_rm_trial),
              alpha = 0.05,
-             position = position_dodge(0.2)) +
+             position = position_dodge(0.8)) +
   
   
   geom_errorbar(data = data_across_subject4, aes(x = setsize,
@@ -502,18 +545,19 @@ my_plot4 <-  ggplot() +
                                                  ymax = d_prime_mean + d_prime_SEM,
                                                  group = size_scale,
                                                  color = is_rm_trial),
-                
                 size  = 0.8,
                 width = .00,
                 alpha = 0.8,
-                position = position_dodge(0.2)) +
+                position = position_dodge(0.8)) +
+  
+  geom_hline(yintercept = 1, linetype = "dashed") +
   
   
-  labs(y = "sensitivity (d')", x = "set size") +
+  labs(y = "Sensitivity (d' +/- SEM)", x = "Set size") +
   
   
   scale_color_manual(labels = c("non RM", "RM"),
-                     values = c("#004488", "#BB5566"),
+                     values = c("#1E88E5", "#FFC107"),
                      name = "RM or not") +
   
   
@@ -544,6 +588,47 @@ my_plot4 <-  ggplot() +
 
 
 print(my_plot4)
+
+ggsave(file = "test.svg", plot = my_plot4)
+
+
+# briefly check if d' was significant between rm and non-rm
+
+data_by_subject4$setsize <- as.factor(data_by_subject4$setsize)
+data_by_subject4$is_rm_trial <- as.factor(data_by_subject4$is_rm_trial)
+data_by_subject4$participant <- as.factor(data_by_subject4$participant)
+data_by_subject4$size_scale <- as.factor(data_by_subject4$size_scale)
+
+str(data_by_subject4)
+
+data_by_subject4 <- subset(data_by_subject4, size_scale == "small")
+
+alignment_con.model_random_slope3 <-
+  lmer(
+    d_prime_mean ~ setsize + is_rm_trial + 
+      (1 |participant),
+    data = data_by_subject4,
+    REML = FALSE
+  )
+alignment_con.model_random_slope3
+
+
+coef(alignment_con.model_random_slope3)
+
+alignment_con.null_random_slope3 <-
+  lmer(
+    d_prime_mean ~ setsize + 
+      (1 | participant),
+    data = data_by_subject4,
+    REML = FALSE
+  )
+alignment_con.null_random_slope3
+
+
+anova(alignment_con.model_random_slope3, 
+      alignment_con.null_random_slope3)
+
+
 
 
 # plot: criterion for each set size, separately for rm and non-rm trials--------
@@ -581,7 +666,7 @@ my_plot5 <-  ggplot() +
   geom_hline(yintercept = 0, linetype = "dashed") +
   
   
-  labs(y = "bias (criterion)", x = "set size") +
+  labs(y = "Bias (criterion)", x = "Set size") +
   
   
   scale_color_manual(labels = c("non RM", "RM"),
@@ -616,6 +701,8 @@ my_plot5 <-  ggplot() +
 
 
 print(my_plot5)
+ggsave(file = "test.svg", plot = my_plot5)
+
 
 
 

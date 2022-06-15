@@ -8,6 +8,7 @@ library(sjstats)
 library(lme4)
 library(lmerTest)
 library(MuMIn)
+library(svglite)
 
 # set working path
 setwd("D:/SCALab/projects/RM_face/data/")
@@ -320,7 +321,7 @@ my_plot4 <-  ggplot() +
                                               y = deviation_score_mean,
                                               size = size_scale,
                                               color = size_scale),
-             position = position_dodge(0.2), stat = "identity", alpha = 0.8, width = 0.2) +
+             position = position_dodge(0.8), stat = "identity", alpha = 0.8, width = 0.2) +
   
   scale_size_manual(values = c("small" = 2, "middle"= 4, "large" = 6)) +
   
@@ -333,7 +334,7 @@ my_plot4 <-  ggplot() +
                                           size = size_scale,
                                           color = size_scale),
              alpha = 0.1,
-             position = position_dodge(0.2))+
+             position = position_dodge(0.8))+
   
   geom_errorbar(data = data_across_subject3, aes(x = setsize,
                                                  y = deviation_score_mean,
@@ -344,7 +345,7 @@ my_plot4 <-  ggplot() +
                 color = "black",
                 size  = 0.8,
                 width = .00,
-                position = position_dodge(0.2)) +
+                position = position_dodge(0.8)) +
   
   labs(y = "Deviation score", x = "Set size") +
   
@@ -359,7 +360,7 @@ my_plot4 <-  ggplot() +
   
   scale_x_continuous(breaks = c(3, 4, 5, 6),
                    labels = c("3", "4", "5", "6"),
-                   expand = c(0.1, 0.1)) +
+                   expand = c(0.1, 0.5)) +
   
   
   theme(axis.title.x = element_text(color="black", size=14, face="bold"),
@@ -379,7 +380,9 @@ my_plot4 <-  ggplot() +
         legend.title = element_text(size = 12, face = "bold"),
         legend.text = element_text(size = 10),
         # facet wrap title
-        strip.text.x = element_text(size = 12, face = "bold")) +
+        strip.text.x = element_text(size = 12, face = "bold"),
+        panel.spacing = unit(2.5, "lines")) +
+
   
   facet_wrap( ~stimulus_types,
               labeller = labeller(stimulus_types =
@@ -389,4 +392,48 @@ my_plot4 <-  ggplot() +
 
 print(my_plot4)
 
+ggsave(file = "test.svg", plot = my_plot4)
 
+# LMM
+
+data_by_subject3$setsize <- as.factor(data_by_subject3$setsize)
+data_by_subject3$participant <- as.factor(data_by_subject3$participant)
+data_by_subject3$size_scale <- as.factor(data_by_subject3$size_scale)
+data_by_subject3$stimulus_types <- as.factor(data_by_subject3$stimulus_types)
+
+str(data_by_subject3)
+
+
+alignment_con.model_random_slope3 <-
+  lmer(
+    deviation_score_mean ~ setsize + stimulus_types + size_scale +
+      (1 |participant),
+    data = data_by_subject3,
+    REML = FALSE
+  )
+alignment_con.model_random_slope3
+
+
+coef(alignment_con.model_random_slope3)
+
+alignment_con.null_random_slope3 <-
+  lmer(
+    deviation_score_mean ~ setsize + size_scale +
+      (1 |participant),
+    data = data_by_subject3,
+    REML = FALSE
+  )
+alignment_con.null_random_slope3
+
+
+anova(alignment_con.model_random_slope3, 
+      alignment_con.null_random_slope3)
+
+tab_model(alignment_con.model_random_slope3, p.val = "kr", show.df = TRUE, show.std = TRUE, show.se = TRUE, show.stat = TRUE)
+
+
+emmeans(
+  alignment_con.model_random_slope3,
+  list(pairwise ~ stimulus_types * size_scale),
+  adjust = "tukey"
+)

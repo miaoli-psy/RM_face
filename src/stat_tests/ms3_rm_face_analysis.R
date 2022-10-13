@@ -15,6 +15,9 @@ library(ggplot2)
 library(ggthemes)
 library(svglite)
 library(sjPlot)
+library(ggpubr)
+
+# Exp1-------------------------------------------------------
 
 # set working path
 setwd("D:/SCALab/projects/RM_face/data/")
@@ -96,3 +99,32 @@ emmip(model_random_slope, size_scale ~ setsize|stimulus_types)
 
 # test 2 way interaction
 
+
+# Exp2-------------------------------------------------------
+# read data
+data_preprocessed <- read_excel("exp2_preprocessed.xlsx")
+
+# check age, sex
+df_check_age <- data_preprocessed %>%
+  group_by(participant, age, sex) %>%
+  tally() 
+
+mean(df_check_age$age)
+
+
+# data by subject
+data_by_subject <- data_preprocessed %>%
+  group_by(stimulus_types,
+           participant,
+           setsize,
+           size_scale) %>%
+  summarise(
+    deviation_score_mean = mean(deviation_score),
+    deviation_score_std = sd(deviation_score),
+    n = n()
+  ) %>%
+  mutate(
+    deviation_socre_SEM = deviation_score_std / sqrt(n),
+    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n -
+                                                    1)
+  )

@@ -9,6 +9,10 @@ def cal_deviation_score(resp, setsize):
     return resp - setsize
 
 
+def cal_cv(deviation, numerosity):
+    return round(deviation/numerosity, 4)
+
+
 def cal_SEM(input_std: float, sample_number) -> float:
     """This function returns the SEM given the std and the sample size"""
     return round(input_std / math.sqrt(sample_number - 1), 4)

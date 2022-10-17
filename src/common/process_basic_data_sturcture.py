@@ -9,10 +9,6 @@ def cal_deviation_score(resp, setsize):
     return resp - setsize
 
 
-def cal_cv(deviation, numerosity):
-    return round(deviation/numerosity, 4)
-
-
 def cal_SEM(input_std: float, sample_number) -> float:
     """This function returns the SEM given the std and the sample size"""
     return round(input_std / math.sqrt(sample_number - 1), 4)
@@ -68,6 +64,7 @@ def get_usd_resp_order2(is_face_usd, resp):
             return 1
         else:
             return 0
+
 
 def convert_size_to_str(inputsize: float):
     if inputsize == 0.74:

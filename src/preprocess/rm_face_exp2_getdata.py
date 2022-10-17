@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from src.common.process_basic_data_sturcture import get_usd_resp_order1, get_usd_resp_order2, convert_str_num_to_num, \
-    cal_deviation_score, get_new_spacing_con, is_rm_trial, is_hit, is_miss, is_false_alarm, is_correct_rejection, cal_cv
+    cal_deviation_score, get_new_spacing_con, is_rm_trial, is_hit, is_miss, is_false_alarm, is_correct_rejection
 from src.common.process_dataframe import insert_new_col_from_two_cols, insert_new_col
 from src.constants.rm_face_pilot_exp_constants import COL_exp2
 
@@ -57,9 +57,6 @@ if __name__ == '__main__':
 
     # cal deviation score
     insert_new_col_from_two_cols(totalData, "response_num", "setsize", "deviation_score", cal_deviation_score)
-
-    # cal cv
-    insert_new_col_from_two_cols(totalData, "deviation_score", "setsize", "cv", cal_cv)
 
     # rm trials or not
     insert_new_col(totalData, "deviation_score", "is_rm_trial", is_rm_trial)

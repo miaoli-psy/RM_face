@@ -40,18 +40,17 @@ data_by_subject <- data_preprocessed %>%
  summarize(
     deviation_score_mean = mean(deviation_score),
     deviation_score_std = sd(deviation_score),
-    n = n(),
-    cv_mean = mean(cv)
+    n = n()
   ) %>%
 mutate(
     deviation_socre_SEM = deviation_score_std / sqrt(n),
-    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n -
-                                                    1)
+    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    cv = deviation_score_std / setsize
   )
 
 # summary statistics---------------------------------------
 
-summary_stat <- data_preprocessed %>%
+summary_stat <- data_by_subject %>%
   group_by(stimulus_types, setsize, size_scale) %>%
   get_summary_stats(cv, type = "mean_sd")
 
@@ -60,7 +59,7 @@ summary_stat
 # check box plot--------------------------------------------
 
 bxp <- ggboxplot(
-  data_by_subject, x = "setsize", y = "cv_mean", 
+  data_by_subject, x = "setsize", y = "deviation_score_mean", 
   color = "size_scale", palette = "stimulus_types", facet.by = "stimulus_types"
 )
 bxp
@@ -74,7 +73,7 @@ shapiro_test <- data_by_subject %>%
 shapiro_test
 
 
-ggqqplot(data_by_subject, "cv_mean", ggtheme = theme_bw()) +
+ggqqplot(data_by_subject, "cv", ggtheme = theme_bw()) +
   facet_grid(setsize + size_scale ~ stimulus_types, labeller = "label_both")
 
 # 3 way repeat measure ANOVA --------------------------------
@@ -83,7 +82,7 @@ data_by_subject <- ungroup(data_by_subject)
 
 res.aov <- anova_test(
   data = data_by_subject,
-  dv = cv_mean,
+  dv = cv,
   wid = participant,
   within = c(setsize, size_scale, stimulus_types)
 )

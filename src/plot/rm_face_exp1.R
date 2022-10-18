@@ -218,37 +218,59 @@ my_plot2 <-  ggplot() +
 print(my_plot2)
 
 
-# combine spacing, plot deviation score - each type of stimuli, combined spacing-------------
+# combine spacing, plot deviation score/CV - each type of stimuli, combined spacing-------------
 
 data_by_subject3 <- data_preprocessed %>%
-  group_by(setsize, participant, stimulus_types, size_scale) %>%
-  summarise(deviation_score_mean = mean(deviation_score),
-            deviation_score_std = sd(deviation_score),
-            rt_mean = mean(rt),
-            rt_std = sd(rt))
+  group_by(stimulus_types,
+           participant,
+           setsize,
+           size_scale) %>%
+  summarise(
+    deviation_score_mean = mean(deviation_score),
+    deviation_score_std = sd(deviation_score),
+    n = n(),
+    rt_mean = mean(rt),
+    rt_std = sd(rt),
+  ) %>%
+  mutate(
+    deviation_socre_SEM = deviation_score_std / sqrt(n),
+    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    rt_SEM = rt_std / sqrt(n),
+    cv = deviation_score_std / setsize,
+    cv_CI = cv / sqrt(n),
+    rt_SEM = rt_std / sqrt(n)
+  )
 
-# data across subject
+
 data_across_subject3 <- data_preprocessed %>%
-  group_by(setsize, stimulus_types, size_scale) %>%
-  summarise(deviation_score_mean = mean(deviation_score),
-            deviation_score_std = sd(deviation_score),
-            rt_mean = mean(rt),
-            rt_std = sd(rt))
+  group_by(stimulus_types,
+           setsize,
+           size_scale) %>%
+  summarise(
+    deviation_score_mean = mean(deviation_score),
+    deviation_score_std = sd(deviation_score),
+    n = n(),
+    rt_mean = mean(rt),
+    rt_std = sd(rt),
+  ) %>%
+  mutate(
+    deviation_socre_SEM = deviation_score_std / sqrt(n),
+    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    rt_SEM = rt_std / sqrt(n),
+    cv = deviation_score_std / setsize,
+    cv_CI = cv / sqrt(n),
+    rt_SEM = rt_std / sqrt(n)
+  )
 
-# samplesize = 288 (each condition 24 repetition * 12 participant)
-data_across_subject3 <- data_across_subject3 %>%
-  mutate(deviation_socre_SEM = deviation_score_std / sqrt(288),
-         rt_SEM = rt_std / sqrt(288))
-
+ 
 my_plot3 <-  ggplot() +
   
   geom_point(data = data_across_subject3, aes(x = stimulus_types,
                                               y = deviation_score_mean,
                                               size = size_scale,
                                               color = size_scale),
-             position = position_dodge(0.2), stat = "identity", alpha = 0.8, width = 0.2) +
+             position = position_dodge(0.4), stat = "identity", alpha = 0.8) +
   
-  scale_size_manual(values = c("small" = 2, "middle"= 4, "large" = 6)) +
   
   geom_hline(yintercept = 0, linetype = "dashed") +
   
@@ -259,7 +281,7 @@ my_plot3 <-  ggplot() +
                                           size = size_scale,
                                           color = size_scale),
              alpha = 0.1,
-             position = position_dodge(0.2))+
+             position = position_dodge(0.4))+
   
   geom_errorbar(data = data_across_subject3, aes(x = stimulus_types,
                                                  y = deviation_score_mean,
@@ -270,9 +292,9 @@ my_plot3 <-  ggplot() +
                 color = "black",
                 size  = 0.8,
                 width = .00,
-                position = position_dodge(0.2)) +
+                position = position_dodge(0.4)) +
   
-  labs(y = "Deviation score", x = "Stimulus type") +
+  labs(y = "Deviation Score (DV)", x = "Stimulus Type") +
   
   scale_color_manual(labels = c("large", "middle", "small"),
                      values = c("#004488", "#BB5566", "#DDAA33"),
@@ -307,10 +329,91 @@ my_plot3 <-  ggplot() +
         # facet wrap title
         strip.text.x = element_text(size = 12, face = "bold")) +
   
-  facet_wrap( ~setsize)
+  facet_wrap( ~setsize, nrow = 1,
+              labeller = labeller(setsize =
+                                    c("3" = "set size 3",
+                                      "4" = "set size 4",
+                                      "5" = "set size 5",
+                                      "6" = "set size 6")))
+
 
 print(my_plot3)
 
+
+my_plot3_b <-  ggplot() +
+  
+  geom_point(data = data_across_subject3, aes(x = stimulus_types,
+                                              y = cv,
+                                              size = size_scale,
+                                              color = size_scale),
+             position = position_dodge(0.4), stat = "identity", alpha = 0.8) +
+  
+  
+  # each data point represents the average deviation of 1 participant
+  geom_point(data = data_by_subject3, aes(x = stimulus_types,
+                                          y = cv,
+                                          size = size_scale,
+                                          color = size_scale),
+             alpha = 0.1,
+             position = position_dodge(0.4))+
+  
+  geom_errorbar(data = data_across_subject3, aes(x = stimulus_types,
+                                                 y = cv,
+                                                 ymin =  cv - cv_CI,
+                                                 ymax = cv + cv_CI,
+                                                 group = size_scale),
+                
+                color = "black",
+                size  = 0.8,
+                width = .00,
+                position = position_dodge(0.4)) +
+  
+  labs(y = "Coefficient of Variation (CV) ", x = "Stimulus Type") +
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "stimuli size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "stimuli size") +
+  
+  scale_x_discrete(breaks = c("NF", "NF_scramble", "outline"),
+                   labels = c("face", "scrambled face", "outline"),
+                   expand = c(0.1, 0.1)) +
+  
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold")) +
+  
+  facet_wrap( ~setsize, nrow = 1,
+              labeller = labeller(setsize =
+                                    c("3" = "set size 3",
+                                      "4" = "set size 4",
+                                      "5" = "set size 5",
+                                      "6" = "set size 6")))
+
+print(my_plot3_b)
+
+ggsave(file = "3.svg", plot = my_plot3, width = 11.3, height = 3.36, units = "in")
+ggsave(file = "3b.svg", plot = my_plot3_b,width = 11.3, height = 3.36, units = "in")
 
 
 # plot: deviation socre - set size, seprate plot for stim type ------------
@@ -392,48 +495,130 @@ my_plot4 <-  ggplot() +
 
 print(my_plot4)
 
-ggsave(file = "test.svg", plot = my_plot4)
-
-# LMM
-
-data_by_subject3$setsize <- as.factor(data_by_subject3$setsize)
-data_by_subject3$participant <- as.factor(data_by_subject3$participant)
-data_by_subject3$size_scale <- as.factor(data_by_subject3$size_scale)
-data_by_subject3$stimulus_types <- as.factor(data_by_subject3$stimulus_types)
-
-str(data_by_subject3)
+ggsave(file = "test.svg", plot = my_plot4, width = 11.3, height = 3.93, units = "in")
 
 
-alignment_con.model_random_slope3 <-
-  lmer(
-    deviation_score_mean ~ setsize + stimulus_types + size_scale +
-      (1 |participant),
-    data = data_by_subject3,
-    REML = FALSE
-  )
-alignment_con.model_random_slope3
+# bar plot deviation score-----------------------------------------
+
+# all conditions, all stimuli
+
+data_preprocessed$size_scale <- factor(data_preprocessed$size_scale,      
+                                levels = c("small", "middle", "large"))
+
+my_plot5 <-
+  
+  ggplot(data = data_preprocessed, 
+         aes(x = response)) +
+  
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat = "count") +
+  
+  geom_text(aes(label = scales::percent(..prop..),
+                 y = ..prop.. ), stat = "count", vjust = -.5, size = 2.5) +
+  
+  labs(y = "Percent response", fill = "Response", x = "Response") +
+  
+  scale_y_continuous(labels = scales::percent) +
+  
+  scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7, 8)) +
+  
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"),
+        panel.spacing = unit(2.5, "lines")) +
+  
+  
+  facet_wrap( ~stimulus_types * size_scale * setsize,
+              labeller = labeller(stimulus_types =
+                                    c("NF" = "face",
+                                      "NF_scramble" = "noise patch",
+                                      "outline" = "outline"),
+                                  size_scale = 
+                                    c("large" = "large stimuli",
+                                      "middle" = "medium stimuli",
+                                      "small" = "small stimuli"),
+                                  setsize = 
+                                    c("3" = "set size 3",
+                                      "4" = "set size 4",
+                                      "5" = "set size 5",
+                                      "6" = "set size 6")))
+
+my_plot5
+
+ggsave(file = "5.svg", plot = my_plot5, width = 16.7, height = 16, units = "in")
+
+# only face
+
+data_faces <- data_preprocessed %>% 
+  filter((stimulus_types == "NF" & setsize == 3))
+
+data_faces$size_scale <- factor(data_faces$size_scale,      
+                         levels = c("small", "middle", "large"))
 
 
-coef(alignment_con.model_random_slope3)
+my_plot5_b <-
+  
+  ggplot(data = data_faces, aes(x = response)) +
+  
+  geom_bar(aes(y = ..prop..), stat = "count", fill = "#EEEEEE") +
+  
+  geom_text(aes(label = scales::percent(..prop..),
+                y = ..prop.. ), stat = "count", vjust = -.5, size = 2.5) +
+  
+  labs(y = "Percent Response", x = "Response") +
+  
+  scale_y_continuous(labels = scales::percent) +
+  
+  scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7, 8)) +
+  
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"),
+        panel.spacing = unit(2.5, "lines")) +
+  
+  
+  facet_wrap( ~ size_scale * setsize,
+              labeller = labeller(size_scale = 
+                                    c("large" = "large stimuli",
+                                      "middle" = "medium stimuli",
+                                      "small" = "small stimuli"),
+                                  setsize = 
+                                    c("3" = "set size 3",
+                                      "4" = "set size 4",
+                                      "5" = "set size 5",
+                                      "6" = "set size 6")))
 
-alignment_con.null_random_slope3 <-
-  lmer(
-    deviation_score_mean ~ setsize + size_scale +
-      (1 |participant),
-    data = data_by_subject3,
-    REML = FALSE
-  )
-alignment_con.null_random_slope3
+my_plot5_b
 
-
-anova(alignment_con.model_random_slope3, 
-      alignment_con.null_random_slope3)
-
-tab_model(alignment_con.model_random_slope3, p.val = "kr", show.df = TRUE, show.std = TRUE, show.se = TRUE, show.stat = TRUE)
-
-
-emmeans(
-  alignment_con.model_random_slope3,
-  list(pairwise ~ stimulus_types * size_scale),
-  adjust = "tukey"
-)
+ggsave(file = "5b.svg", plot = my_plot5_b, width = 11.3, height = 3.4, units = "in")

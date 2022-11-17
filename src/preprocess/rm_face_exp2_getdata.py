@@ -9,7 +9,7 @@ from src.constants.rm_face_pilot_exp_constants import COL_exp2
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = False
+    is_main_exp = True
 
     if is_main_exp:
         PATH = "../../data/raw_data/exp2/"

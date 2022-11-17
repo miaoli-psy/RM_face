@@ -126,8 +126,10 @@ def get_if_rm_occor(dv):
 def is_rm_trial(deviation_score):
     if deviation_score < 0:
         return "RM trials"
+    elif deviation_score == 0:
+        return "correct trials"
     else:
-        return "non RM trials"
+        return "overestimation trials"
 
 
 def is_hit(identity, response):

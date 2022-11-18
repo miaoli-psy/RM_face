@@ -237,7 +237,7 @@ data_by_subject3 <- data_preprocessed %>%
     deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
     rt_SEM = rt_std / sqrt(n),
     cv = deviation_score_std / setsize,
-    cv_CI = cv / sqrt(n),
+    cv_SEM = cv / sqrt(n),
     rt_SEM = rt_std / sqrt(n)
   )
 
@@ -258,7 +258,7 @@ data_across_subject3 <- data_preprocessed %>%
     deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
     rt_SEM = rt_std / sqrt(n),
     cv = deviation_score_std / setsize,
-    cv_CI = cv / sqrt(n),
+    cv_SEM = cv / sqrt(n),
     rt_SEM = rt_std / sqrt(n)
   )
 
@@ -359,8 +359,8 @@ my_plot3_b <-  ggplot() +
   
   geom_errorbar(data = data_across_subject3, aes(x = stimulus_types,
                                                  y = cv,
-                                                 ymin =  cv - cv_CI,
-                                                 ymax = cv + cv_CI,
+                                                 ymin =  cv - cv_SEM,
+                                                 ymax = cv + cv_SEM,
                                                  group = size_scale),
                 
                 color = "black",

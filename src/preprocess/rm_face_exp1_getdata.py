@@ -2,7 +2,8 @@ import os
 
 import pandas as pd
 
-from src.common.process_basic_data_sturcture import convert_str_num_to_num, cal_deviation_score, get_new_spacing_con
+from src.common.process_basic_data_sturcture import convert_str_num_to_num, cal_deviation_score, get_new_spacing_con, \
+    is_rm_trial
 from src.common.process_dataframe import process_col, insert_new_col_from_two_cols, insert_new_col
 from src.constants.rm_face_pilot_exp_constants import COL_exp1, COL_exp1_discri
 
@@ -44,6 +45,9 @@ if __name__ == '__main__':
 
     # cal deviation score
     insert_new_col_from_two_cols(totalData, "response", "setsize", "deviation_score", cal_deviation_score)
+
+    # is RM trials
+    insert_new_col(totalData, "deviation_score", "is_rm_trial", is_rm_trial)
 
     # insert new spacing condition
     if is_main_exp:

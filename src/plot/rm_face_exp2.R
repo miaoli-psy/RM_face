@@ -20,7 +20,7 @@ data_preprocessed <- read_excel("exp2_preprocessed.xlsx")
 # check: number of RM trials ----------------------------------------------
 
 count_rm_trails <- data_preprocessed %>% 
-  group_by(setsize, identity) %>% 
+  group_by(setsize) %>% 
   count(is_rm_trial)
 
 count_rm_trails

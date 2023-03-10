@@ -64,9 +64,11 @@ summary_stat
 
 # check box plot--------------------------------------------
 
+# data <- subset(data_by_subject, stimulus_types == "NF_scramble")
+
 bxp <- ggboxplot(
-  data_by_subject, x = "setsize", y = "deviation_score_mean", 
-  color = "size_scale", palette = "stimulus_types", facet.by = "stimulus_types"
+  data_by_subject, x = "setsize", y = "rt_mean", 
+  color = "size_scale", facet.by = "stimulus_types"
 )
 bxp
 
@@ -94,7 +96,7 @@ data_by_subject$size_scale <- as.factor(data_by_subject$size_scale)
 
 res.aov <- anova_test(
   data = data_by_subject,
-  dv = cv,
+  dv = deviation_score_mean,
   wid = participant,
   within = c(setsize, size_scale, stimulus_types),
   type = 3,
@@ -107,7 +109,7 @@ get_anova_table(res.aov, correction =  "auto") # "auto"
 # 看刺激类型的主效应
 summary_stat2 <- data_by_subject %>%
   group_by(stimulus_types) %>%
-  get_summary_stats(cv, type = "mean_sd")
+  get_summary_stats(deviation_score_mean, type = "mean_sd")
 
 summary_stat2
 
@@ -182,13 +184,16 @@ data_by_subject2 <- data_preprocessed2 %>%
     deviation_score_mean = mean(deviation_score),
     deviation_score_std = sd(deviation_score),
     n = n(),
-    rt_num_mean = mean(response1_rt),
-    rt_num_std = sd(response1_rt),
+    rt_num_mean = mean(num_task_rt),
+    rt_num_std = sd(num_task_rt),
+    rt_ori_mean = mean(ori_task_rt),
+    rt_ori_std = sd(ori_task_rt)
   ) %>%
   mutate(
     deviation_socre_SEM = deviation_score_std / sqrt(n),
     deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
-    rt_SEM = rt_num_std / sqrt(n),
+    rt_num_SEM = rt_num_std / sqrt(n),
+    rt_ori_SEM = rt_ori_std / sqrt(n),
     cv = deviation_score_std / setsize,
     cv_SEM = cv / sqrt(n),
     rt_SEM = rt_num_std / sqrt(n)
@@ -197,7 +202,7 @@ data_by_subject2 <- data_preprocessed2 %>%
 # check box plot--------------------------------------------
 
 bxp <- ggboxplot(
-  data_by_subject2, x = "setsize", y = "deviation_score_mean", 
+  data_by_subject2, x = "setsize", y = "rt_ori_mean", 
   color = "size_scale", palette = "identity", facet.by = "identity"
 )
 bxp
@@ -225,7 +230,7 @@ data_by_subject2$size_scale <- as.factor(data_by_subject2$size_scale)
 
 res.aov <- anova_test(
   data = data_by_subject2,
-  dv = cv,
+  dv = rt_ori_mean,
   wid = participant,
   within = c(setsize, size_scale, identity),
   type = 3,
@@ -338,6 +343,14 @@ res.aov <- anova_test(
 )
 get_anova_table(res.aov, correction =  "auto") # "auto"
 
+
+summary_stat3 <- data_by_subject3 %>%
+  group_by(is_rm_trial, size_scale) %>%
+  get_summary_stats(d_prime_mean, type = "mean_sd")
+
+summary_stat3
+
+
 pwc_setsize <- data_by_subject3 %>%
   group_by(is_rm_trial) %>%
   pairwise_t_test(d_prime_mean ~ size_scale, paired = FALSE, p.adjust.method = "holm")
@@ -349,4 +362,5 @@ pwc_trial_type <- data_by_subject3 %>%
   pairwise_t_test(d_prime_mean ~ is_rm_trial, paired = FALSE, p.adjust.method = "holm")
 
 pwc_trial_type
+
 

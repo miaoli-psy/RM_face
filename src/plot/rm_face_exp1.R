@@ -11,7 +11,7 @@ library(MuMIn)
 library(svglite)
 
 # set working path
-setwd("D:/SCALab/projects/RM_face/data/")
+setwd("c:/SCALab/projects/RM_face/data/")
 
 data_preprocessed <- read_excel("exp1_preprocessed.xlsx")
 
@@ -412,8 +412,80 @@ my_plot3_b <-  ggplot() +
 
 print(my_plot3_b)
 
+
+my_plot3_c <-  ggplot() +
+  
+  geom_point(data = data_across_subject3, aes(x = stimulus_types,
+                                              y = deviation_score_mean,
+                                              size = size_scale,
+                                              color = size_scale),
+             position = position_dodge(0.4), stat = "identity", alpha = 0.8) +
+  
+  
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  
+  
+  geom_errorbar(data = data_across_subject3, aes(x = stimulus_types,
+                                                 y = deviation_score_mean,
+                                                 ymin = deviation_score_mean - deviation_socre_SEM,
+                                                 ymax = deviation_score_mean + deviation_socre_SEM,
+                                                 group = size_scale),
+                
+                color = "black",
+                size  = 0.8,
+                width = .00,
+                position = position_dodge(0.4)) +
+  
+  labs(y = "Deviation score", x = "Stimulus type") +
+  
+  scale_y_continuous(limits = c(-1.5, 0)) +
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "stimuli size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "stimuli size") +
+  
+  scale_x_discrete(breaks = c("NF", "NF_scramble", "outline"),
+                   labels = c("face", "scrambled face", "outline"),
+                   expand = c(0.1, 0.1)) +
+  
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold")) +
+  
+  facet_wrap( ~setsize, nrow = 1,
+              labeller = labeller(setsize =
+                                    c("3" = "set size 3",
+                                      "4" = "set size 4",
+                                      "5" = "set size 5",
+                                      "6" = "set size 6")))
+
+
+print(my_plot3_c)
+
 ggsave(file = "3.svg", plot = my_plot3, width = 11.3, height = 3.36, units = "in")
 ggsave(file = "3b.svg", plot = my_plot3_b,width = 11.3, height = 3.36, units = "in")
+ggsave(file = "3c.svg", plot = my_plot3_c,width = 11.3, height = 3.36, units = "in")
 
 
 # plot: deviation socre - set size, seprate plot for stim type ------------

@@ -53,6 +53,12 @@ if __name__ == '__main__':
     insert_new_col(totalData_order1, "response1", "response_num", convert_str_num_to_num)
     insert_new_col(totalData_order2, "response2", "response_num", convert_str_num_to_num)
 
+    totalData_order1["num_task_rt"] = totalData_order1["response1_rt"]
+    totalData_order1["ori_task_rt"] = totalData_order1["response2_rt"]
+
+    totalData_order2["num_task_rt"] = totalData_order2["response2_rt"]
+    totalData_order2["ori_task_rt"] = totalData_order2["response1_rt"]
+
     totalData = pd.concat([totalData_order1, totalData_order2])
 
     # cal deviation score

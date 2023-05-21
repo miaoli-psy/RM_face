@@ -471,7 +471,8 @@ my_plot3_c <-  ggplot() +
         legend.title = element_text(size = 12, face = "bold"),
         legend.text = element_text(size = 10),
         # facet wrap title
-        strip.text.x = element_text(size = 12, face = "bold")) +
+        strip.text.x = element_text(size = 12, face = "bold"),
+        panel.spacing = unit(3, "lines")) +
   
   facet_wrap( ~setsize, nrow = 1,
               labeller = labeller(setsize =
@@ -485,7 +486,7 @@ print(my_plot3_c)
 
 ggsave(file = "3.svg", plot = my_plot3, width = 11.3, height = 3.36, units = "in")
 ggsave(file = "3b.svg", plot = my_plot3_b,width = 11.3, height = 3.36, units = "in")
-ggsave(file = "3c.svg", plot = my_plot3_c,width = 11.3, height = 3.36, units = "in")
+ggsave(file = "3c.svg", plot = my_plot3_c,width = 13, height = 3.36, units = "in")
 
 
 # plot: deviation socre - set size, seprate plot for stim type ------------

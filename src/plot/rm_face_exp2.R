@@ -12,7 +12,7 @@ library(psycho)
 library(svglite)
 
 # set working path
-setwd("D:/SCALab/projects/RM_face/data/")
+setwd("c:/SCALab/projects/RM_face/data/")
 
 data_preprocessed <- read_excel("exp2_preprocessed.xlsx")
 
@@ -549,8 +549,76 @@ my_plot7b <-  ggplot() +
 #                                     "6" = "6 faces")))
 print(my_plot7b)
 
+
+my_plot7c <-  ggplot() +
+  
+  geom_point(data = data_across_subject3, aes(x = setsize,
+                                              y = deviation_score_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = size_scale),
+             position = position_dodge(0.4), stat = "identity", alpha = 0.8) +
+  
+  
+  geom_errorbar(data = data_across_subject3, aes(x = setsize,
+                                                 y = deviation_score_mean,
+                                                 ymin = deviation_score_mean - deviation_socre_SEM,
+                                                 ymax = deviation_score_mean + deviation_socre_SEM,
+                                                 group = size_scale),
+                color = "black",
+                
+                size  = 0.8,
+                width = .00,
+                position = position_dodge(0.4)) +
+  
+  geom_jitter()+
+  
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  
+  
+  labs(y = "Deviation score", x = "Set Size") +
+  
+  scale_y_continuous(limits = c(-1.5, 0)) +
+  
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "face size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  # scale_y_continuous(limits = c(-2, 1)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        panel.spacing = unit(0.4, "cm"),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"))
+
+
+print(my_plot7c)
+
 ggsave(file = "my_plot7.svg", plot = my_plot7, width = 4.2, height = 3.36, units = "in")
 ggsave(file = "my_plot7b.svg", plot = my_plot7b, width = 4.2, height = 3.36, units = "in")
+ggsave(file = "my_plot7c.svg", plot = my_plot7c, width = 4.2, height = 3.36, units = "in")
 
 # plot: percent correct - set size,  separately for rm and non-rm --------
 
@@ -820,6 +888,78 @@ my_plot4 <-  ggplot() +
 print(my_plot4)
 
 ggsave(file = "test.svg", plot = my_plot4, width = 6, height = 3.36, units = "in")
+
+
+my_plot4b <-  ggplot() +
+  
+  geom_point(data = data_across_subject4, aes(x = setsize,
+                                              y = d_prime_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = size_scale),
+             
+             position = position_dodge(0.5), stat = "identity", alpha = 0.6) +
+  
+
+  geom_errorbar(data = data_across_subject4, aes(x = setsize,
+                                                 y = d_prime_mean,
+                                                 ymin = d_prime_mean - d_prime_SEM,
+                                                 ymax = d_prime_mean + d_prime_SEM,
+                                                 group = size_scale),
+                color = "black",
+                size  = 0.8,
+                width = .00,
+                alpha = 0.8,
+                position = position_dodge(0.5)) +
+  
+  
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  
+  
+  labs(y = "Sensitivity (d' +/- SEM)", x = "Set size") +
+  
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "face size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  scale_y_continuous(limits = c(0, 3)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"),
+        panel.spacing = unit(3, "lines")) +
+  
+  facet_wrap( ~ is_rm_trial,
+              nrow = 1,
+              labeller = labeller(is_rm_trial =
+                                    c("correct trials" = "Correct trials",
+                                      "RM trials" = "Redundancy masking trials")))
+
+
+print(my_plot4b)
+
+ggsave(file = "test.svg", plot = my_plot4b, width = 8, height = 3.36, units = "in")
 
 
 # briefly check if d' was significant between rm and non-rm

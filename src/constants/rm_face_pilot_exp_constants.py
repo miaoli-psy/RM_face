@@ -99,3 +99,20 @@ COL_exp2 = ["identity",
             "key_resp_7.rt",
             "sex",
             "age"]
+
+
+COL_exp2_discri = ["identity",
+                   "size_w",
+                   "size_scale",
+                   "spacing_in_deg",
+                   "setsize",
+                   "key_resp.keys",
+                   "key_resp.rt",
+                   "order",
+                   "participant",
+                   "blocks.thisN",
+                   "blocks.thisIndex",
+                   "trials.thisN",
+                   "trials.thisIndex",
+                   "key_resp_7.keys",
+                   "key_resp_7.rt"]

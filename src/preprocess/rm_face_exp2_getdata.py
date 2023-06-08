@@ -5,18 +5,18 @@ import pandas as pd
 from src.common.process_basic_data_sturcture import get_usd_resp_order1, get_usd_resp_order2, convert_str_num_to_num, \
     cal_deviation_score, get_new_spacing_con, is_rm_trial, is_hit, is_miss, is_false_alarm, is_correct_rejection
 from src.common.process_dataframe import insert_new_col_from_two_cols, insert_new_col
-from src.constants.rm_face_pilot_exp_constants import COL_exp2_discri
+from src.constants.rm_face_pilot_exp_constants import COL_exp2_discri, COL_exp2
 
 if __name__ == '__main__':
     to_excel = False
-    is_main_exp = False
+    is_main_exp = True
 
     if is_main_exp:
         PATH = "../../data/raw_data/exp2/"
+        col = COL_exp2
     else:
         PATH = "../../data/raw_data/exp2_disc/"
-
-    col = COL_exp2_discri
+        col = COL_exp2_discri
 
     # list data file
     files = os.listdir(PATH)

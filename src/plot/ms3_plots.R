@@ -460,3 +460,118 @@ my_plot5_b <-
 my_plot5_b
 
 ggsave(file = "5b.svg", plot = my_plot5_b, width = 11.3, height = 3.4, units = "in")
+
+
+# Exp2-------------------------------------------------------
+# read data
+data_preprocessed2 <- read_excel(path = file.choose())
+
+
+data_by_subject2 <- data_preprocessed %>%
+  group_by(identity,
+           participant,
+           setsize,
+           size_scale) %>%
+  summarise(
+    deviation_score_mean = mean(deviation_score),
+    deviation_score_std = sd(deviation_score),
+    n = n()
+  ) %>%
+  mutate(
+    deviation_socre_SEM = deviation_score_std / sqrt(n),
+    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    cv = deviation_score_std / setsize,
+    cv_SEM = cv / sqrt(n)
+  )
+
+
+data_across_subject2 <- data_preprocessed %>%
+  group_by(identity,
+           setsize,
+           size_scale) %>%
+  summarise(
+    deviation_score_mean = mean(deviation_score),
+    deviation_score_std = sd(deviation_score),
+    n = n()
+  ) %>%
+  mutate(
+    deviation_socre_SEM = deviation_score_std / sqrt(n),
+    deviation_socre_CI = deviation_socre_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    cv = deviation_score_std / setsize,
+    cv_SEM = cv / sqrt(n),
+
+  )
+
+# plot: deviation score- setsize combined spacing, orientation -----------------------
+
+
+my_plot6 <-  ggplot() +
+  
+  geom_point(data = data_across_subject3, aes(x = setsize,
+                                              y = deviation_score_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = size_scale),
+             position = position_dodge(0.4), stat = "identity", alpha = 0.8) +
+  
+  # geom_point(data = data_by_subject3, aes(x = setsize,
+  #                                         y = deviation_score_mean,
+  #                                         size = size_scale,
+  #                                         color = size_scale),
+  #            alpha = 0.1,
+  #            position = position_dodge(0.4)) +
+  
+  
+  geom_errorbar(data = data_across_subject3, aes(x = setsize,
+                                                 y = deviation_score_mean,
+                                                 ymin = deviation_score_mean - deviation_socre_CI,
+                                                 ymax = deviation_score_mean + deviation_socre_CI,
+                                                 group = size_scale,
+                                                 color = size_scale),
+                size  = 0.8,
+                width = .00,
+                position = position_dodge(0.4)) +
+  
+  geom_jitter()+
+  
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  
+  
+  labs(y = "Deviation Score (DV)", x = "Set Size") +
+  
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "face size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  # scale_y_continuous(limits = c(-2, 1)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        panel.spacing = unit(0.4, "cm"),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"))
+
+print(my_plot6)
+
+

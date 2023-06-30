@@ -1,6 +1,5 @@
 # some type of files
 *.csv
-*.xlsx
 *.docx
 *.png
 *.pdf
@@ -92,7 +91,15 @@ run_exp2_discr/
 run_pliot0/
 run_exp1_num_task/
 run_exp2_dualtask/
+kortirjk/
+pilot_exp1/
+pilot_exp2/
+
 
 stimuli/
 match_spacing/
 .idea/
+
+# specific files
+/data/exp1_disc_preprocessed.xlsx
+/data/exp2_disc_preprocessed.xlsx

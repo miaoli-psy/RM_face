@@ -1,92 +1,14 @@
 # libraires ---------------------------------------------------------------
-if(!require(readxl)){
-  install.packages("readxl")
-  library(readxl)
-}
+#install.packages("readxl","tidyverse","lme4", "sjPlot", "glmmTMB", "rstatix", "emmeans", "sjstats")
+#install.packages("lmerTest", "MuMIn", "multcomp", "nlme", "r2glmm","ggplot2", "ggthemes", "svglite","ggpubr")
+# install.packages('MCMCglmm')
 
-if(!require(tidyverse)){
-  install.packages("tidyverse")
-  library(tidyverse)
-}
-
-if(!require(lme4)){
-  install.packages("lme4")
-  library(lme4)
-}
-
-
-if(!require(sjPlot)){
-  install.packages("sjPlot")
-  library(sjPlot)
-}
-
-if(!require(glmmTMB)){
-  install.packages("glmmTMB")
-  library(glmmTMB)
-}
-
-
-if(!require(rstatix)){
-  install.packages("rstatix")
-  library(rstatix)
-}
-
-if(!require(emmeans)){
-  install.packages("emmeans")
-  library(emmeans)
-}
-
-if(!require(sjstats)){
-  install.packages("sjstats")
-  library(sjstats)
-}
-
-
-if(!require(lmerTest)){
-  install.packages("lmerTest")
-  library(lmerTest)
-}
-
-if(!require(MuMIn)){
-  install.packages("MuMIn")
-  library(MuMIn)
-}
-
-if(!require(multcomp)){
-  install.packages("multcomp")
-  library(multcomp)
-}
-
-if(!require(nlme)){
-  install.packages("nlme")
-  library(nlme)
-}
-
-if(!require(r2glmm)){
-  install.packages("r2glmm")
-  library(r2glmm)
-}
-
-if(!require(ggplot2)){
-  install.packages("ggplot2")
-  library(ggplot2)
-}
-
-if(!require(ggthemes)){
-  install.packages("ggthemes")
-  library(ggthemes)
-}
-
-if(!require(svglite)){
-  install.packages("svglite")
-  library(svglite)
-}
-
-
-if(!require(ggpubr)){
-  install.packages("ggpubr")
-  library(ggpubr)
-}
+# how to library multiple packages at the same time.
+library(tidyverse)
+library(ggplot2)
+library(ggthemes)
+library(svglite)
+library(ggpubr)
 
 # Exp1--------------------------------------------------------------------------
 
@@ -95,7 +17,7 @@ if(!require(ggpubr)){
 
 # read data
 # data_preprocessed <- read_excel("exp1_preprocessed.xlsx")
-data_preprocessed <- read_excel(path = file.choose())
+data_preprocessed <- readxl::read_excel(path = file.choose())
 
 # check age, sex
 df_check_age <- data_preprocessed %>%
@@ -114,100 +36,127 @@ data_preprocessed$setsize<- as.integer(data_preprocessed$setsize)
 data_preprocessed$participant<- as.factor(data_preprocessed$participant)
 
 # categorize Deviation score
+# data_preprocessed$DV_cate <- ifelse(data_preprocessed$deviation_score<0, 1, 0) 
+# data_preprocessed$DV_cate <- as.factor(data_preprocessed$DV_cate)
 
-data_preprocessed <- data_preprocessed %>% 
-  mutate(DV_cate = case_when(
-    deviation_score < 0 ~ 0,
-    deviation_score >= 0 ~ 1)
-  )
+# # GLMM model
+# 
+# e1.model.glmm.1 <-
+#   lme4::glmer(
+#     DV_cate ~ stimulus_types + size_scale + setsize + (1 | participant),
+#     data = data_preprocessed,
+#     family = binomial
+#   )
 
-data_preprocessed$DV_cate<- as.factor(data_preprocessed$DV_cate)
+# e1.model.glmm.inter1 <-
+#   lme4::glmer(
+#     DV_cate ~ stimulus_types + size_scale + setsize + stimulus_types:setsize +
+#       (1 | participant),
+#     data = data_preprocessed,
+#     family = binomial
+#   )
+# anova(e1.model.glmm.1, e1.model.glmm.inter1)
+# 
+# e1.model.glmm.2 <- lme4::glmer(DV_cate ~ size_scale + setsize +(1|participant), 
+#                                data = data_preprocessed, family = binomial)
+# summary(e1.model.glmm.1)
+# # model comparison: find whether certian predictors are significant
+# anova(e1.model.glmm.1, e1.model.glmm.2)
+
+# possible problem: interaction effects from descriptive analysis (figure 2 in the paper)
+# solution: model comparison between the simple model and complex model (with interaction terms)
 
 
-# GLMM model
+# continuous outcome: try linear mixed model
+e1.lmm1 <- lme4::lmer(deviation_score ~ stimulus_types + size_scale + setsize +(1|participant), 
+                      data = data_preprocessed)
+e1.lmm2 <- lme4::lmer(deviation_score ~ stimulus_types + setsize +(1|participant), 
+                      data = data_preprocessed)
+e1.lmm3 <- lme4::lmer(deviation_score ~ stimulus_types + size_scale +(1|participant), 
+                      data = data_preprocessed)
 
-model.glmer <- glmer(DV_cate ~ stimulus_types + size_scale + setsize +(1|participant), data = data_preprocessed, family = binomial)
-model1.1.glmer <- glmer(DV_cate ~ size_scale + setsize +(1|participant), data = data_preprocessed, family = binomial)
+summary(e1.lmm1)
 
-summary(model.glmer)
-anova(model.glmer, model1.1.glmer)
+# check whether stimulus_types/size_scale is significant globally
+anova(e1.lmm1, e1.lmm3) 
+
+# how to create a table: https://cran.r-project.org/web/packages/sjPlot/vignettes/tab_mixed.html
+sjPlot::tab_model(
+  e1.lmm1,
+  p.style = 'scientific_stars',
+  show.se = T,
+  show.stat = T,
+  digits = 3
+) #change scientific p-value to numeric manually
+
 
 # pairwise comparisons
-emms <- emmeans(
-  model.glmer,
-  list(pairwise ~ stimulus_types),
-  adjust = "tukey"
-)
+emms <- emmeans::emmeans(e1.lmm1,
+                         list(pairwise ~ stimulus_types),
+                         adjust = "tukey")
 
 summary(emms, infer = TRUE)
 
-# try glmmTMB package
-model.glmer2 <- glmmTMB(
-  DV_cate ~ stimulus_types + size_scale + setsize + (1 | participant),
-  family = binomial, 
-  data = data_preprocessed
-)
 
-summary(model.glmer2)
+# calculate expected mean
 
-# an APA style table: https://cran.r-project.org/web/packages/sjPlot/vignettes/tab_mixed.html
-# ????? table only works with model fitting by glmmTMB
-
-tab_model(model.glmer2, p.val = "kr", show.df = TRUE, show.std = TRUE, show.se = TRUE, show.stat = TRUE)
-
-# calculate expected probability
-# way 1: general expected probability (ignoring the individual differences,i.e.random effects)
-data_to_predict1 = data.frame(stimulus_types = "NF_scramble", size_scale = "small", setsize = 3)
-data_to_predict2 = data.frame(stimulus_types = "NF", size_scale = "large", setsize = 6)
-## you set change parameters based on what you want to do more prediction
-predict(model.glmer, newdata = data_to_predict2, type = "response", re.form = NA)
-
-# way 2: average individual's predicted probability
-attach(data_preprocessed)
-predict_conditions <- tidyr::crossing(stimulus_types, 
-                                      size_scale, 
-                                      setsize, 
-                                      participant)
-predict_n <- nrow(predict_conditions)
+# way 1: general expected mean (ignoring the individual differences,i.e.random effects)
+predict_conditions <-
+  tidyr::crossing(
+    data_preprocessed$stimulus_types,
+    data_preprocessed$size_scale,
+    data_preprocessed$setsize
+  )
+names(predict_conditions) <- c('stimulus_types', 'size_scale', 'setsize')
 
 prediction_results <- data.frame()
-for (i in 1:predict_n){
-  predict_person <- predict(model.glmer, newdata = predict_conditions[i,], type = "response")
-  prediction_results <- rbind(prediction_results, data.frame(predict_person))
+for (i in 1:nrow(predict_conditions)) {
+  prediction <-
+    predict(
+      e1.lmm1,
+      newdata = predict_conditions[i, ],
+      type = "response",
+      re.form = NA
+    )
+  prediction_results <-
+    rbind(prediction_results, data.frame(prediction))
 }
 
-person_prob_all <- cbind(predict_conditions, prediction_results)
+prob_condi_combi <- cbind(predict_conditions, prediction_results) 
+
+# way 2: calculated individual expected mean
+predict_person <- tidyr::crossing(data_preprocessed$stimulus_types, data_preprocessed$size_scale, 
+                                  data_preprocessed$setsize, data_preprocessed$participant)
+names(predict_person) <- c('stimulus_types','size_scale','setsize','participant')
+
+predict_results_per <- data.frame()
+for (i in 1:nrow(predict_person)){
+  prediction2<- predict(e1.lmm1, newdata = predict_person[i,])
+  predict_results_per <- rbind(predict_results_per, data.frame(prediction2))
+}
+
+prob_person <- cbind(predict_person, predict_results_per)
 
 # test
-predict(model.glmer, newdata = predict_conditions[420,], type = "response")
-person_prob_all[420,] # correct
+predict(e1.lmm1, newdata = predict_person[420,])
+prob_person[420,] # correct
 
+# the results of way 2 are close to way 1
 
-# calculate probability < 0 
-
-person_prob_all <- person_prob_all %>% 
-  mutate(predict_person_lessthan0 = 1 - predict_person)
-
-
-# calculate mean for certain conditions (you can change conditions by yourself)
-colMeans(subset(person_prob_all, stimulus_types == "NF_scramble"& size_scale == "small"& setsize == 3, 
-                select = (predict_person_lessthan0)))
 
 
 # calculate mean/std/sem/ci for each condition
-predic_res <- person_prob_all %>% 
+predic_res <- prob_person %>% 
   group_by(stimulus_types,
-           setsize,
-           size_scale) %>% 
-  summarise(prob = mean(predict_person_lessthan0),
-            prob_std = sd(predict_person_lessthan0),
-            n = n()
-            ) %>% 
-  mutate(
-  prob_SEM = prob_std / sqrt(n),
-  prob_CI = prob_SEM * qt((1 - 0.05) / 2 + .5, n -
-                                                1)
-)
+           size_scale,
+           setsize) %>% 
+  summarise(prediction_res = mean(prediction2),
+            prediction_res_std = sd(prediction2),
+            n = n()) %>% 
+  mutate(prediction_res_SEM = prediction_res_std / sqrt(n),
+         prediction_res_CI = prediction_res_SEM * qt((1 - 0.05) / 2 + .5, n -1))
+
+
 
 # visualization prediction res
 
@@ -217,7 +166,7 @@ my_plot_predic <-  ggplot() +
     data = predic_res,
     aes(
       x = setsize,
-      y = prob,
+      y = prediction_res,
       size = size_scale,
       color = size_scale
     ),
@@ -238,9 +187,9 @@ my_plot_predic <-  ggplot() +
     data = predic_res,
     aes(
       x = setsize,
-      y = prob,
-      ymin = prob - prob_SEM,
-      ymax = prob + prob_SEM,
+      y = prediction_res,
+      ymin = prediction_res - prediction_res_CI,
+      ymax = prediction_res + prediction_res_CI,
       group = size_scale,
       color = size_scale
     ),
@@ -318,12 +267,12 @@ my_plot_predic <-  ggplot() +
              ))
 
 print(my_plot_predic)
-ggsave(file = "test2.svg", plot = my_plot_predic, width = 7.42, height = 2.7, units = "in")
+ ggsave(file = "test2.svg", plot = my_plot_predic, width = 7.42, height = 2.7, units = "in")
 
 
 # Exp2-------------------------------------------------------
 # read data
-data_preprocessed2 <- read_excel(path = file.choose())
+data_preprocessed2 <- readxl::read_excel(path = file.choose())
 
   # check age, sex
 df_check_age2 <- data_preprocessed2 %>%
@@ -347,84 +296,98 @@ data_preprocessed2$participant<- as.factor(data_preprocessed2$participant)
 
 # categorize Deviation score
 
-data_preprocessed2 <- data_preprocessed2 %>% 
-  mutate(DV_cate = case_when(
-    deviation_score < 0 ~ 0,
-    deviation_score >= 0 ~ 1)
-  )
+# data_preprocessed2 <- data_preprocessed2 %>% 
+#   mutate(DV_cate = case_when(
+#     deviation_score < 0 ~ 0,
+#     deviation_score >= 0 ~ 1)
+#   )
+# 
+# data_preprocessed2$DV_cate<- as.factor(data_preprocessed2$DV_cate)
+# 
+# 
+# # GLMM model
+# 
+# model2.glmer <- glmer(DV_cate ~ identity + size_scale + setsize +(1|participant), data = data_preprocessed2, family = binomial)
+# model2.1.glmer <- glmer(DV_cate ~ identity + setsize +(1|participant), data = data_preprocessed2, family = binomial)
+# 
+# summary(model2.glmer)
+# anova(model2.glmer, model2.1.glmer)
+# 
+# # pairwise comparisons
+# emms <- emmeans(
+#   model2.glmer,
+#   list(pairwise ~ size_scale),
+#   adjust = "tukey"
+# )
 
-data_preprocessed2$DV_cate<- as.factor(data_preprocessed2$DV_cate)
 
+e2.lmm1 <- lme4::lmer(deviation_score ~ identity + size_scale + setsize +(1|participant), 
+                      data = data_preprocessed2)
 
-# GLMM model
+e2.lmm2 <- lme4::lmer(deviation_score ~ size_scale + setsize +(1|participant), 
+                      data = data_preprocessed2) #this one is a better model, without identity (face ori)
 
-model2.glmer <- glmer(DV_cate ~ identity + size_scale + setsize +(1|participant), data = data_preprocessed2, family = binomial)
-model2.1.glmer <- glmer(DV_cate ~ identity + setsize +(1|participant), data = data_preprocessed2, family = binomial)
+anova(e2.lmm1, e2.lmm2)
 
-summary(model2.glmer)
-anova(model2.glmer, model2.1.glmer)
+e3.lmm3 <- lme4::lmer(deviation_score ~ setsize +(1|participant), 
+                      data = data_preprocessed2)
+
+anova(e2.lmm2, e3.lmm3)
+
+summary(e2.lmm2)
 
 # pairwise comparisons
-emms <- emmeans(
-  model2.glmer,
+emms <- emmeans::emmeans(
+  e2.lmm2,
   list(pairwise ~ size_scale),
   adjust = "tukey"
 )
 
+summary(emms)
+
+# APA table
+sjPlot::tab_model(
+  e2.lmm2,
+  p.style = 'scientific_stars',
+  show.se = T,
+  show.stat = T,
+  digits = 3
+) #change scientific p-value to numeric manually
 
 
-# calculate expected probability
+# prediction DV exp2
 
-attach(data_preprocessed2)
-predict_conditions <- tidyr::crossing(identity, 
-                                      size_scale, 
-                                      setsize, 
-                                      participant)
-predict_n <- nrow(predict_conditions)
+predict_person2 <- tidyr::crossing(
+  data_preprocessed2$size_scale,
+  data_preprocessed2$setsize,
+  data_preprocessed2$participant
+)
+names(predict_person2) <- c('size_scale', 'setsize', 'participant')
 
-prediction_results <- data.frame()
-for (i in 1:predict_n){
-  predict_person <- predict(model2.glmer, newdata = predict_conditions[i,], type = "response")
-  prediction_results <- rbind(prediction_results, data.frame(predict_person))
+predict_results_per2 <- data.frame()
+for (i in 1:nrow(predict_person2)) {
+  prediction2 <- predict(e2.lmm2, newdata = predict_person2[i, ])
+  predict_results_per2 <-
+    rbind(predict_results_per2, data.frame(prediction2))
 }
 
-person_prob_all <- cbind(predict_conditions, prediction_results)
-
-# test
-predict(model2.glmer, newdata = predict_conditions[288,], type = "response")
-person_prob_all[288,] # correct
+prob_person2 <- cbind(predict_person2, predict_results_per2)
 
 
-# calculate probability < 0 
+predic_res2 <- prob_person2 %>% 
+  group_by(size_scale,
+           setsize) %>% 
+  summarise(prob = mean(prediction2),
+            prob_std = sd(prediction2),
+            n = n()) %>% 
+  mutate(prob_SEM = prob_std / sqrt(n),
+         prob_CI = prob_SEM * qt((1 - 0.05) / 2 + .5, n -1))
 
-person_prob_all <- person_prob_all %>% 
-  mutate(predict_person_lessthan0 = 1 - predict_person)
-
-
-# calculate mean for certain conditions (you can change conditions by yourself)
-colMeans(subset(person_prob_all, identity == "NF_usd"& size_scale == "small"& setsize == 3, 
-                select = (predict_person_lessthan0)))
-
-
-# calculate mean/std/sem/ci for each condition
-predic_res <- person_prob_all %>% 
-  group_by(identity,
-           setsize,
-           size_scale) %>% 
-  summarise(prob = mean(predict_person_lessthan0),
-            prob_std = sd(predict_person_lessthan0),
-            n = n()
-  ) %>% 
-  mutate(
-    prob_SEM = prob_std / sqrt(n),
-    prob_CI = prob_SEM * qt((1 - 0.05) / 2 + .5, n -
-                              1)
-  )
-
+# visulization prediction results
 my_plot_predic2 <-  ggplot() +
   
   geom_point(
-    data = predic_res,
+    data = predic_res2,
     aes(
       x = setsize,
       y = prob,
@@ -445,7 +408,7 @@ my_plot_predic2 <-  ggplot() +
   geom_hline(yintercept = 0.5, linetype = "dashed") +
   
   geom_errorbar(
-    data = predic_res,
+    data = predic_res2,
     aes(
       x = setsize,
       y = prob,
@@ -513,21 +476,12 @@ my_plot_predic2 <-  ggplot() +
     legend.text = element_text(size = 10),
     # facet wrap title
     strip.text.x = element_text(size = 12, face = "bold"),
-    panel.spacing = unit(1.0, "lines")
-  ) +
-  
-  
-  facet_wrap(~ identity,
-             labeller = labeller(
-               identity =
-                 c(
-                   "NF" = "face",
-                   "NF_usd" = "unside-down face"
-                 )
-             ))
+    panel.spacing = unit(1.0, "lines"))
+
 
 print(my_plot_predic2)
-ggsave(file = "test2.svg", plot = my_plot_predic2, width = 7.42, height = 2.7, units = "in")
+
+# ggsave(file = "test2.svg", plot = my_plot_predic2, width = 7.42, height = 2.7, units = "in")
 
 
 # ------------------Exp 2 orientation task ------------------------
@@ -553,58 +507,74 @@ data_SDT_across_subject <- data_preprocessed2 %>%
 
 
 # read data exp2 SDT
-data_cdt <- read_excel(path = file.choose()) #rm_face_SDT.xlsx
+data_sdt <- readxl::read_excel(path = file.choose()) #rm_face_SDT.xlsx
 table(data_preprocessed2$is_rm_trial)
 
 
 # remove overestimation trials?
-# data_cdt <- subset(data_cdt, is_rm_trial == "RM trials" | is_rm_trial == "correct trials")
+# data_sdt <- subset(data_sdt, is_rm_trial == "RM trials" | is_rm_trial == "correct trials")
 
-table(data_cdt$is_rm_trial)
+table(data_sdt$is_rm_trial)
 
-data_cdt <- data_cdt %>% 
+data_sdt <- data_sdt %>% 
   mutate(is_rm_trial_new = case_when(
     is_rm_trial == "RM trials" ~ "RM",
     is_rm_trial == "correct trials" ~ "non-RM",
     is_rm_trial =="overestimation trials" ~ "non-RM"))
 
-table(data_cdt$is_rm_trial_new)
+table(data_sdt$is_rm_trial_new)
 
-str(data_cdt)
+str(data_sdt)
 # subset data by selecting rows with RM and correct trials
-# data_cdt.sub <- data_cdt[data_cdt$is_rm_trial%in% c("correct trials", 'RM trials'),]
-# table(data_cdt.sub$is_rm_trial)
+# data_sdt.sub <- data_sdt[data_sdt$is_rm_trial%in% c("correct trials", 'RM trials'),]
+# table(data_sdt.sub$is_rm_trial)
 
 
-data_cdt$is_rm_trial<- as.factor(data_cdt$is_rm_trial_new)
-data_cdt$setsize<- as.integer(data_cdt$setsize)
-data_cdt$participant<- as.factor(data_cdt$participant)
-data_cdt$size_scale<- as.factor(data_cdt$size_scale)
+data_sdt$is_rm_trial<- as.factor(data_sdt$is_rm_trial_new)
+data_sdt$setsize<- as.integer(data_sdt$setsize)
+data_sdt$participant<- as.factor(data_sdt$participant)
+data_sdt$size_scale<- as.factor(data_sdt$size_scale)
 
 
 # create a single variable to indicate groups
-data_cdt$group_index <- paste(data_cdt$size_scale, data_cdt$is_rm_trial_new, sep = ':')
+data_sdt$group_index <- paste(data_sdt$size_scale, data_sdt$is_rm_trial_new, sep = ':')
 
-# Fit the linear mixed model with the categorical variable
-model <- lmer(d_prime ~ group_index + (1|participant), data = data_cdt)
-summary(model)
+# 
+# # Fit the linear mixed model with the categorical variable
+# model <- lmer(d_prime ~ group_index + (1|participant), data = data_sdt)
+# summary(model)
+# 
+# # Compute estimated marginal means
+# means <- emmeans(model, ~ group_index)
+# 
+# # Perform pairwise comparisons with Tukey correction
+# comparison <- pairs(means, by = NULL, test = "t", adjust = "tukey") 
+# # by parameter can set reference group
+# 
+# # adjust can be set by other methods, like " bonferroni", "mvt", etc
+# pwpp(means, adjust = "tukey") # a nice plot to summarize P-value of group comparison
+# 
+# 
+# # pairwise comparisons
+# emms2 <- emmeans(
+#   model,
+#   list(pairwise ~ group_index),
+#   adjust = "tukey"
+# )   
+# 
+# summary(emms2, infer = TRUE)
 
-# Compute estimated marginal means
-means <- emmeans(model, ~ group_index)
 
-# Perform pairwise comparisons with Tukey correction
-comparison <- pairs(means, by = NULL, test = "t", adjust = "tukey") 
-# by parameter can set reference group
+# exp2: task2: H0: no difference between rm and non-rm
+# Bayesian linear mixed model
 
-# adjust can be set by other methods, like " bonferroni", "mvt", etc
-pwpp(means, adjust = "tukey") # a nice plot to summarize P-value of group comparison
+e2.t2.mcmc <- MCMCglmm::MCMCglmm(d_prime ~ group_index, random =~participant, 
+                                 data = data_sdt)
+
+e2.t2.mcmc2 <- MCMCglmm::MCMCglmm(d_prime ~ setsize + size_scale + is_rm_trial, 
+                                  random =~participant, 
+                                  data = data_sdt)
+
+summary(e2.t2.mcmc)
 
 
-# pairwise comparisons
-emms2 <- emmeans(
-  model,
-  list(pairwise ~ group_index),
-  adjust = "tukey"
-)
-
-summary(emms2, infer = TRUE)

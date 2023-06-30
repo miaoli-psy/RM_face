@@ -14,7 +14,8 @@ library(svglite)
 # set working path
 setwd("c:/SCALab/projects/RM_face/data/")
 
-data_preprocessed <- read_excel("exp2_preprocessed.xlsx")
+data_preprocessed <- read_excel("exp2_preprocessed.xlsx"
+                                )
 
 
 # check: number of RM trials ----------------------------------------------

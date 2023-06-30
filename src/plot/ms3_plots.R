@@ -1,38 +1,13 @@
 # libraires ---------------------------------------------------------------
-if(!require(readxl)){
-  install.packages("readxl")
-  library(readxl)
-}
+# install.packages("readxl",
+#                  "tidyverse",
+#                  "ggplot2",
+#                  "ggthemes",
+#                  "svglite",
+#                  "sjPlot",
+#                  "ggpubr")
 
-if(!require(tidyverse)){
-  install.packages("tidyverse")
-  library(tidyverse)
-}
-
-if(!require(ggplot2)){
-  install.packages("ggplot2")
-  library(ggplot2)
-}
-
-if(!require(ggthemes)){
-  install.packages("ggthemes")
-  library(ggthemes)
-}
-
-if(!require(svglite)){
-  install.packages("svglite")
-  library(svglite)
-}
-
-if(!require(sjPlot)){
-  install.packages("sjPlot")
-  library(sjPlot)
-}
-
-if(!require(ggpubr)){
-  install.packages("ggpubr")
-  library(ggpubr)
-}
+library(tidyverse)
 
 # Exp1--------------------------------------------------------------------------
 
@@ -464,12 +439,11 @@ ggsave(file = "5b.svg", plot = my_plot5_b, width = 11.3, height = 3.4, units = "
 
 # Exp2-------------------------------------------------------
 # read data
-data_preprocessed2 <- read_excel(path = file.choose())
+data_preprocessed2 <- readxl::read_excel(path = file.choose())
 
 
-data_by_subject2 <- data_preprocessed %>%
-  group_by(identity,
-           participant,
+data_by_subject2 <- data_preprocessed2 %>%
+  group_by(participant,
            setsize,
            size_scale) %>%
   summarise(
@@ -485,9 +459,8 @@ data_by_subject2 <- data_preprocessed %>%
   )
 
 
-data_across_subject2 <- data_preprocessed %>%
-  group_by(identity,
-           setsize,
+data_across_subject2 <- data_preprocessed2 %>%
+  group_by(setsize,
            size_scale) %>%
   summarise(
     deviation_score_mean = mean(deviation_score),
@@ -507,7 +480,7 @@ data_across_subject2 <- data_preprocessed %>%
 
 my_plot6 <-  ggplot() +
   
-  geom_point(data = data_across_subject3, aes(x = setsize,
+  geom_point(data = data_across_subject2, aes(x = setsize,
                                               y = deviation_score_mean,
                                               size = size_scale,
                                               group = size_scale,
@@ -522,7 +495,7 @@ my_plot6 <-  ggplot() +
   #            position = position_dodge(0.4)) +
   
   
-  geom_errorbar(data = data_across_subject3, aes(x = setsize,
+  geom_errorbar(data = data_across_subject2, aes(x = setsize,
                                                  y = deviation_score_mean,
                                                  ymin = deviation_score_mean - deviation_socre_CI,
                                                  ymax = deviation_score_mean + deviation_socre_CI,
@@ -573,5 +546,136 @@ my_plot6 <-  ggplot() +
         strip.text.x = element_text(size = 12, face = "bold"))
 
 print(my_plot6)
+
+ggsave(file = "exp2_dv.svg", plot = my_plot6, width = 4, height = 3.4, units = "in")
+
+
+# exp2 ori task ------------------------------------------------------------
+data_sdt <- readxl::read_excel(path = file.choose()) #rm_face_SDT.xlsx
+
+# RM vs. Non-RM
+data_sdt <- data_sdt %>% 
+  mutate(is_rm_trial_new = case_when(
+    is_rm_trial == "RM trials" ~ "RM",
+    is_rm_trial == "correct trials" ~ "non-RM",
+    is_rm_trial =="overestimation trials" ~ "non-RM"))
+
+table(data_sdt$is_rm_trial_new)
+
+# warning: not many trials per every condition - no std, sem could be calculated
+# for several conditions
+data_by_subject_sdt <- data_sdt %>% 
+  group_by(
+    setsize,
+    participant,
+    size_scale,
+    is_rm_trial_new) %>% 
+  summarise(
+    d_prime_mean = mean(d_prime),
+    d_prime_std = sd(d_prime),
+    c_mean = mean(c),
+    c_std = sd(c),
+    n = n()
+  ) %>% 
+  mutate(
+    d_prime_SEM = d_prime_std /sqrt(n),
+    c_SEM = c_std / sqrt(n),
+    d_prime_CI = d_prime_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    c_CI = c_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+  )
+
+
+data_across_subject_sdt <- data_sdt %>% 
+  group_by(
+    setsize,
+    size_scale,
+    is_rm_trial_new) %>% 
+  summarise(
+    d_prime_mean = mean(d_prime),
+    d_prime_std = sd(d_prime),
+    c_mean = mean(c),
+    c_std = sd(c),
+    n = n()
+  ) %>% 
+  mutate(
+    d_prime_SEM = d_prime_std /sqrt(n),
+    c_SEM = c_std / sqrt(n),
+    d_prime_CI = d_prime_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+    c_CI = c_SEM * qt((1 - 0.05) / 2 + .5, n - 1),
+  )
+
+
+
+
+my_plot7 <-  ggplot() +
+  
+  geom_point(data = data_across_subject_sdt, aes(x = setsize,
+                                              y = d_prime_mean,
+                                              size = size_scale,
+                                              group = size_scale,
+                                              color = size_scale),
+             
+             position = position_dodge(0.5), stat = "identity", alpha = 0.6) +
+  
+  
+  geom_errorbar(data = data_across_subject_sdt, aes(x = setsize,
+                                                 y = d_prime_mean,
+                                                 ymin = d_prime_mean - d_prime_CI,
+                                                 ymax = d_prime_mean + d_prime_CI,
+                                                 group = size_scale,
+                                                 color = size_scale),
+                size  = 0.8,
+                width = .00,
+                alpha = 0.8,
+                position = position_dodge(0.5)) +
+  
+  
+  # geom_hline(yintercept = 1, linetype = "dashed") +
+  
+  
+  labs(y = "Sensitivity (d' +/- SEM)", x = "Set size") +
+  
+  
+  scale_color_manual(labels = c("large", "middle", "small"),
+                     values = c("#004488", "#BB5566", "#DDAA33"),
+                     name = "face size") +
+  
+  
+  scale_size_manual(labels = c("large", "middle", "small"),
+                    values = c("large" = 6, "middle"= 4, "small" = 2),
+                    name = "face size") +
+  
+  scale_y_continuous(limits = c(0, 5)) +
+  
+  theme(axis.title.x = element_text(color="black", size=14, face="bold"),
+        axis.title.y = element_text(color="black", size=14, face="bold"),
+        panel.border = element_blank(),  
+        # remove panel grid lines
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # remove panel background
+        panel.background = element_blank(),
+        # add axis line
+        axis.line = element_line(colour = "grey"),
+        # x,y axis tick labels
+        axis.text.x = element_text(size = 12, face = "bold"),
+        axis.text.y = element_text(size = 12, face = "bold"),
+        # legend size
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 10),
+        # facet wrap title
+        strip.text.x = element_text(size = 12, face = "bold"),
+        panel.spacing = unit(3, "lines")) +
+  
+  facet_wrap( ~ is_rm_trial_new,
+              nrow = 1,
+              labeller = labeller(is_rm_trial_new =
+                                    c("RM" = "RM trials",
+                                      "non-RM" = "non-RM trials")))
+
+
+print(my_plot7)
+
+ggsave(file = "exp2_ori.svg", plot = my_plot7, width = 7, height = 3.4, units = "in")
 
 

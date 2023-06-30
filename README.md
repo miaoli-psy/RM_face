@@ -12,17 +12,22 @@ Faces are crucial for social interactions and usually can be detected rapidly an
 
 ## This repository is structured as follows:
 
-* data/: A directory containing the datasets used in the paper, each subfolder for one experiment
-    * ms2_uniform_prolific_1_data/
-    * ms2_mix_prolific_2_data/
-    * ms2_uniform_mix_3_data/
-    * ms2_triplets_4_data/
-* displays/ms2_displays: displays used for each experiment
+* data/: A directory containing the datasets used in the paper
+    * exp1_preprocessed.xlsx
+    * exp2_preprocessed.xlsx
+    * rm_face_SDT.xlsx
+    * rm_face_disc_STD.xlsx
+
 * src/: A directory containing all the analysis code
+    * common/: contains code that processes common data structure
+    * constants/: constants used in the analysis and plot
+    * plot/: code for plots and figures
+    * power/: code for power analysis
+    * preprocess/: code for preprocess data
+    * stat_tests/: code for stats
+
 
 * README.md: This file.
-
-* requirements.txt: Provide a list of software dependencies and hardware requirements needed to run the code.]
 
 
 ## Licensing

@@ -506,7 +506,7 @@ data_SDT_across_subject <- data_preprocessed2 %>%
 # write.csv(data_SDT_by_subject, "rm_face_to_cal_SDT.csv")
 
 
-# read data exp2 SDT
+# read data exp2 SDT---------------------------------------------------------
 data_sdt <- readxl::read_excel(path = file.choose()) #rm_face_SDT.xlsx
 table(data_preprocessed2$is_rm_trial)
 
@@ -535,9 +535,11 @@ data_sdt$setsize<- as.integer(data_sdt$setsize)
 data_sdt$participant<- as.factor(data_sdt$participant)
 data_sdt$size_scale<- as.factor(data_sdt$size_scale)
 
+data_sdt <- as.data.frame(data_sdt)
+
 
 # create a single variable to indicate groups
-data_sdt$group_index <- paste(data_sdt$size_scale, data_sdt$is_rm_trial_new, sep = ':')
+# data_sdt$group_index <- paste(data_sdt$size_scale, data_sdt$is_rm_trial_new, sep = ':')
 
 # 
 # # Fit the linear mixed model with the categorical variable
@@ -568,13 +570,16 @@ data_sdt$group_index <- paste(data_sdt$size_scale, data_sdt$is_rm_trial_new, sep
 # exp2: task2: H0: no difference between rm and non-rm
 # Bayesian linear mixed model
 
-e2.t2.mcmc <- MCMCglmm::MCMCglmm(d_prime ~ group_index, random =~participant, 
-                                 data = data_sdt)
 
-e2.t2.mcmc2 <- MCMCglmm::MCMCglmm(d_prime ~ setsize + size_scale + is_rm_trial, 
-                                  random =~participant, 
+e2.t2.mcmc2 <- MCMCglmm::MCMCglmm(d_prime ~ setsize + size_scale + is_rm_trial_new, 
+                                  random =~participant, family = 'gaussian',
                                   data = data_sdt)
+# check diagnosis plots
+plot(e2.t2.mcmc2)
+# check auto-correlation for random effects
+coda::autocorr(e2.t2.mcmc2$VCV)
+# check auto-correlation for fixed effects
+coda::autocorr(e2.t2.mcmc2$Sol)
 
-summary(e2.t2.mcmc)
-
+summary(e2.t2.mcmc2)
 

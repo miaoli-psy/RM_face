@@ -26,7 +26,44 @@ df_check_age <- data_preprocessed %>%
 
 mean(df_check_age$age)
 
-# ---------------------------Exp1 DV analysis -GLMM------------------------------
+# 95% CI
+
+res_DV <- data_preprocessed %>% 
+  group_by(
+    stimulus_types,
+    setsize,
+    size_scale
+  ) %>% 
+  summarise(
+    DV_mean = mean(deviation_score),
+    DV_std = sd(deviation_score),
+    n = n()
+  ) %>% 
+  mutate(
+    DV_SEM = DV_std / sqrt(n),
+    DV_CI = DV_SEM * qt((1 - 0.05) / 2 + .5, n - 1)
+  )
+
+res_DV$CI_95_low <- res_DV$DV_mean - res_DV$DV_CI
+res_DV$CI_95_up <- res_DV$DV_mean + res_DV$DV_CI
+
+# mean DV, combined sizes and setsize
+
+mean_DV <- data_preprocessed %>% 
+  group_by(
+    stimulus_types,
+  ) %>% 
+  summarise(
+    DV_mean = mean(deviation_score),
+    DV_std = sd(deviation_score),
+    n = n()
+  ) %>% 
+  mutate(
+    DV_SEM = DV_std / sqrt(n),
+    DV_CI = DV_SEM * qt((1 - 0.05) / 2 + .5, n - 1)
+  )
+
+# ---------------------------Exp1 DV analysis -LMM------------------------------
 
 str(data_preprocessed)
 
@@ -72,7 +109,7 @@ e1.lmm1 <- lme4::lmer(deviation_score ~ stimulus_types + size_scale + setsize +(
                       data = data_preprocessed)
 e1.lmm2 <- lme4::lmer(deviation_score ~ stimulus_types + setsize +(1|participant), 
                       data = data_preprocessed)
-e1.lmm3 <- lme4::lmer(deviation_score ~ stimulus_types + size_scale +(1|participant), 
+e1.lmm3 <- lme4::lmer(deviation_score ~ setsize + size_scale +(1|participant), 
                       data = data_preprocessed)
 
 summary(e1.lmm1)

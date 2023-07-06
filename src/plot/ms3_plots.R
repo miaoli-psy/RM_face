@@ -286,9 +286,9 @@ my_plot3_c <-  ggplot() +
 
 print(my_plot3_c)
 
-ggsave(file = "3.svg", plot = my_plot3, width = 11.3, height = 3.36, units = "in")
-ggsave(file = "3b.svg", plot = my_plot3_b,width = 11.3, height = 3.36, units = "in")
-ggsave(file = "3c.svg", plot = my_plot3_c,width = 13, height = 3.36, units = "in")
+# ggsave(file = "3.svg", plot = my_plot3, width = 11.3, height = 3.36, units = "in")
+# ggsave(file = "3b.svg", plot = my_plot3_b,width = 11.3, height = 3.36, units = "in")
+# ggsave(file = "3c.svg", plot = my_plot3_c,width = 13, height = 3.36, units = "in")
 
 
 # plot: deviation socre - set size, seprate plot for stim type ------------
@@ -370,8 +370,8 @@ my_plot4 <-  ggplot() +
 
 print(my_plot4)
 
-ggsave(file = "test.svg", plot = my_plot4, width = 11.3, height = 3.93, units = "in")
-ggsave(file = "test.svg", plot = my_plot4, width = 7.42, height = 2.7, units = "in")
+# ggsave(file = "test.svg", plot = my_plot4, width = 11.3, height = 3.93, units = "in")
+# ggsave(file = "test2.svg", plot = my_plot4, width = 7.42, height = 2.7, units = "in")
 
 
 
@@ -434,7 +434,7 @@ my_plot5_b <-
 
 my_plot5_b
 
-ggsave(file = "5b.svg", plot = my_plot5_b, width = 11.3, height = 3.4, units = "in")
+# ggsave(file = "5b.svg", plot = my_plot5_b, width = 11.3, height = 3.4, units = "in")
 
 
 # Exp2-------------------------------------------------------
@@ -547,7 +547,7 @@ my_plot6 <-  ggplot() +
 
 print(my_plot6)
 
-ggsave(file = "exp2_dv.svg", plot = my_plot6, width = 4, height = 3.4, units = "in")
+# ggsave(file = "exp2_dv.svg", plot = my_plot6, width = 4, height = 3.4, units = "in")
 
 
 # exp2 ori task ------------------------------------------------------------
@@ -676,6 +676,6 @@ my_plot7 <-  ggplot() +
 
 print(my_plot7)
 
-ggsave(file = "exp2_ori.svg", plot = my_plot7, width = 7, height = 3.4, units = "in")
+# ggsave(file = "exp2_ori.svg", plot = my_plot7, width = 7, height = 3.4, units = "in")
 
 

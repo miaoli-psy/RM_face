@@ -319,6 +319,28 @@ df_check_age2 <- data_preprocessed2 %>%
 mean(df_check_age2$age)
 
 
+# 95% CI
+
+res_DV2 <- data_preprocessed2 %>% 
+  group_by(
+    setsize,
+    size_scale
+  ) %>% 
+  summarise(
+    DV_mean = mean(deviation_score),
+    DV_std = sd(deviation_score),
+    n = n()
+  ) %>% 
+  mutate(
+    DV_SEM = DV_std / sqrt(n),
+    DV_CI = DV_SEM * qt((1 - 0.05) / 2 + .5, n - 1)
+  )
+
+res_DV2$CI_95_low <- res_DV2$DV_mean - res_DV2$DV_CI
+res_DV2$CI_95_up <- res_DV2$DV_mean + res_DV2$DV_CI
+
+
+
 # ------------------Exp 2 number task ------------------------
 
 str(data_preprocessed2)
